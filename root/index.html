@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>XR Demo</title>
+    <meta
+      name="description"
+      content="A list of A-Frame entries submitted to the js13kGames 2017 competition, used as an example for the MDN articles about Progressive Web Apps." />
+    <meta name="author" content="end3r" />
+    <meta name="theme-color" content="#B12A34" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--<link rel="icon" href="favicon.ico" />-->
+    <link rel="stylesheet" href="styles/style.css" />
+    <!--link rel="manifest" href="xr-demo.webmanifest" /-->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/",
+        "lilGUI" : "https://cdn.jsdelivr.net/npm/lil-gui@0.20/+esm"
+      } 
+    }
+    </script>
+    <script type="module" src="scripts/app.js" defer="defer"></script>
+  </head>
+  <body>
+    <div></div>
+  </body>
+</html>
