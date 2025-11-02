@@ -21,6 +21,13 @@
       } 
     }
     </script>
+<script>
+  window.onOpenCvReady = function() {
+    console.log('OpenCV.js loaded and onOpenCvReady called');
+    window.cvReady = true;
+  };
+</script>
+<script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
 <script type="module" src="scripts/app.js" defer="defer"></script>
   </head>
   <body>

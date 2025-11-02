@@ -14,17 +14,28 @@ export class application{
         this.Initialise_Data();
         this.construct_Gui();
         this.construct_Navigator();
-
+        this.arTracker = null;
 
     }
     async initialize(){
         await this.navigator.initialize(this.Flying_Camera,this.canvas,this.Flying_Camera_Controls);
         this.following_Camera = this.navigator.FCam.cam;
 
+        // Initialize AR environment tracking
+        this.arTracker = new AREnvironmentTracker(THREE, this.scene);
+        await this.arTracker.initialize();
     }
 
 
-
+cleanup() {
+        if (this.arTracker) {
+            this.arTracker.cleanup();
+        }
+        // Clean up other resources
+        this.renderer.dispose();
+        this.scene.clear();
+        this.gui.destroy();
+    }
 
 
     construct_scene_And_Renderer(){
@@ -113,6 +124,12 @@ export class application{
                 this.Flying_Camera_Controls.enableZoom = false;
                 this.cameraData.enableZoom = false;
                 this.cameraData.enableScroll = true;
+                }
+                else if (val === 'AR'){
+                    this.cameraData.currentCamera = this.Flying_Camera;
+                    this.Flying_Camera_Controls.enableZoom = false;
+                    this.cameraData.enableZoom = false;
+                    this.cameraData.enableScroll = false;
                 }
             });
         cameraFolder.add(this, 'Reset').name('Reset');
@@ -207,6 +224,11 @@ export class application{
         this.updateFPS(deltaTime);
         this.updateCamera(deltaTime);
         this.updateNavigator(deltaTime,deltascroll);
+
+        if (this.arTracker && this.cameraData.Mode === 'AR') {
+                    this.arTracker.track();
+                }
+
         this.renderer.render(this.scene, this.cameraData.currentCamera);
 
     }
