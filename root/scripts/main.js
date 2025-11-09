@@ -23,12 +23,7 @@ const FRAME_DURATION = 1 / MAX_FPS; // ~0.0167s
 
 
 
-//------------scrolling--------
-window.addEventListener('wheel', (event) => {
-  if(event.deltaY>=0){
-      app.listen_to_Scroll(event.deltaY);
-  }
-});
+
 
 
 

@@ -3,7 +3,9 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as GUI from 'lilGUI';
 import { VRButton } from 'three/webxr/VRButton.js';
-
+import { AssemblyManager } from './AssemblyManager.js';
+import { AnimatedModelManager } from './AnimatedModelManager.js';
+import { ModelLoader } from './ModelLoader.js';
 
 
 
@@ -13,8 +15,21 @@ export class application{
         this.construct_scene_And_Renderer()
         this.construct_camera();
         this.construct_Gui();
+        this.construct_Loaders();
+        
+        // Initialize AssemblyManager (runs alongside Navigator for now)
+        this.assembly_manager = new AssemblyManager(THREE, this.scene, this.gui);
+        this.assembly_manager.initialize(
+            '../jsons/ConfigJson/ModelLoader.json',
+            '../jsons/ConfigJson/AssemblyManager.json'
+        ).catch(console.error);
 
-
+        // Initialize AnimatedModelManager to load a GLB directly from assets (fallback to assets/drone.glb)
+        this.animated_manager = new AnimatedModelManager(THREE, this.scene, this.gui);
+        this.animated_manager.initialize('../jsons/ConfigJson/ModelLoader.json').catch(err => {
+            // initialization will fallback to loading assets/drone.glb if ModelLoader JSON isn't present
+            console.warn('AnimatedModelManager initialization warning:', err);
+        });
     }
 
 
@@ -79,18 +94,11 @@ export class application{
     construct_Gui(){
         this.gui=new GUI.GUI();
         this.gui.add(document, 'title');
-        // this.AddScrollFolder();
         // this.AddRenderingFolder();
         // this.AddCameraFolder();
-
     }
 
 
-    AddScrollFolder(){
-        const ScrollFolder = this.gui.addFolder('Scroll Control');
-        ScrollFolder.add(this.scrollData, 'currentScroll').name('current_scroll').listen();
-        ScrollFolder.add(this.scrollData, 'targetScroll').name('target_scroll').listen();
-    }
 
 
     AddRenderingFolder(){
@@ -103,29 +111,31 @@ export class application{
         const cameraFolder = this.gui.addFolder('Camera Control');
         cameraFolder.add(this.cameraData, 'enableZoom').name('enableZoom').listen();
         cameraFolder.add(this.cameraData, 'enableScroll').name('enableScroll').listen();
-        cameraFolder.add(this.cameraData, 'Mode', ['Flying', 'Follower']).name('Mode').listen()
+        cameraFolder.add(this.cameraData, 'Mode', ['Flying']).name('Mode').listen()
             .onChange(val => {
                 if (val === 'Flying') {
-                this.cameraData.currentCamera = this.Flying_Camera  ;
+                this.cameraData.currentCamera = this.Flying_Camera;
                 this.Flying_Camera_Controls.enableZoom = true;
-                this.cameraData.enableScroll = false;
                 this.cameraData.enableZoom = true;
                 }
-                else if (val=== 'Follower'){
-                this.cameraData.currentCamera = this.following_Camera;
+                else if (val === 'Follower') {
+                // Following camera mode removed - now using WebXR
                 this.Flying_Camera_Controls.enableZoom = false;
                 this.cameraData.enableZoom = false;
-                this.cameraData.enableScroll = true;
                 }
             });
         cameraFolder.add(this, 'Reset').name('Reset');
     }
 
     async construct_Loaders(){
-        this.fbxLoader = new FBXLoader();
-        this.textureLoader = new THREE.TextureLoader();
-        this.Model_Loader =  new ModelLoader(THREE,this.fbxLoader,this.textureLoader,this.gui);
-        await this.Model_Loader.ready;
+        // Initialize ModelLoader with THREE and GUI
+        this.Model_Loader = new ModelLoader(THREE, this.gui);
+        
+        // Initialize with config file
+        await this.Model_Loader.initialize('../jsons/ConfigJson/ModelLoader.json').catch(err => {
+            console.warn('ModelLoader initialization warning:', err);
+            // Continue execution - AnimatedModelManager will fallback to default GLB
+        });
     }
 
 
@@ -147,12 +157,6 @@ export class application{
     }
 
     Initialise_Data(){
-        this.scrollData= {
-            currentScroll : 0,
-            targetScroll : 0,
-            LERP_FACTOR : 0.08,
-        }
-
         this.renderingData= {
             prevTime : 0,
 
@@ -170,19 +174,12 @@ export class application{
         this.cameraData ={
             currentCamera : this.Flying_Camera,
             enableZoom : true,
-            enableScroll: false,
-            Mode : "Flying",// Flying, Follower
+            Mode : "Flying"// Flying, Follower
 
         }
     }
 
-    listen_to_Scroll(deltaY){
-        if(this.cameraData.enableScroll){
-            const scrollFactor = 0.002;
-            this.scrollData.targetScroll += deltaY*scrollFactor;
-        }
 
-    }
     updateFPS(delta) {
         this.renderingData.frameCount++;
         this.renderingData.fpsAccumulator += delta;
@@ -205,6 +202,14 @@ export class application{
     update(deltaTime){
         // In WebXR, we use setAnimationLoop instead of requestAnimationFrame
         this.renderer.setAnimationLoop(() => {
+            // Update assembly animations if manager exists
+            if (this.assembly_manager) {
+                this.assembly_manager.update(deltaTime);
+            }
+            if (this.animated_manager) {
+                this.animated_manager.update(deltaTime);
+            }
+            
             this.renderer.render(this.scene, this.Cam);
         });
     }
