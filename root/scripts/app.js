@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as GUI from 'lilGUI';
-import { Navigator } from './Navigator.js';
+import { VRButton } from 'three/webxr/VRButton.js';
+
 
 
 
@@ -11,17 +12,11 @@ export class application{
     constructor(){
         this.construct_scene_And_Renderer()
         this.construct_camera();
-        this.Initialise_Data();
         this.construct_Gui();
-        this.construct_Navigator();
 
 
     }
-    async initialize(){
-        await this.navigator.initialize(this.Flying_Camera,this.canvas,this.Flying_Camera_Controls);
-        this.following_Camera = this.navigator.FCam.cam;
 
-    }
 
 
 
@@ -59,8 +54,10 @@ export class application{
         this.canvas=this.renderer.domElement;
         document.body.appendChild( this.canvas);
         
+        // Enable WebXR
+        this.renderer.xr.enabled = true;
+        document.body.appendChild( VRButton.createButton(this.renderer) );
         
-
     }
 
 
@@ -69,33 +66,39 @@ export class application{
         const aspect = window.innerWidth / window.innerHeight;
         const near = 0.1;
         const far = 1000;
-        this.Flying_Camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-        this.Flying_Camera.position.set(0, 6.5 ,2);
-        this.Flying_Camera.lookAt(0, 0, 0);
+        this.Cam = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        this.Cam.position.set(0, 6.5 ,2);
+        this.Cam.lookAt(0, 0, 0);
 
-        this.Flying_Camera_Controls = new OrbitControls(this.Flying_Camera, this.canvas);
-
-
-        this.following_Camera = null;
+        this.Cam_Controls = new OrbitControls(this.Cam, this.canvas);
+        this.Cam_Controls.enableDamping = true; 
 
     }
+
+
     construct_Gui(){
         this.gui=new GUI.GUI();
         this.gui.add(document, 'title');
-        this.AddScrollFolder();
-        this.AddRenderingFolder();
-        this.AddCameraFolder();
+        // this.AddScrollFolder();
+        // this.AddRenderingFolder();
+        // this.AddCameraFolder();
 
     }
+
+
     AddScrollFolder(){
         const ScrollFolder = this.gui.addFolder('Scroll Control');
         ScrollFolder.add(this.scrollData, 'currentScroll').name('current_scroll').listen();
         ScrollFolder.add(this.scrollData, 'targetScroll').name('target_scroll').listen();
     }
+
+
     AddRenderingFolder(){
         const renderingFolder = this.gui.addFolder('Rendering Data');
         renderingFolder.add(this.renderingData, 'fps').name('FPS').listen();
     }
+
+
     AddCameraFolder(){
         const cameraFolder = this.gui.addFolder('Camera Control');
         cameraFolder.add(this.cameraData, 'enableZoom').name('enableZoom').listen();
@@ -124,6 +127,8 @@ export class application{
         this.Model_Loader =  new ModelLoader(THREE,this.fbxLoader,this.textureLoader,this.gui);
         await this.Model_Loader.ready;
     }
+
+
     AddLight_To_scene(){
         const ambienLight_Color = 0xffffff;
         const ambienLight_Intensity = 4;
@@ -140,6 +145,7 @@ export class application{
         this.directionalLight.position.set(directionalLight_Position); // Position it to shine from the top-right-front
         this.scene.add(this.directionalLight);
     }
+
     Initialise_Data(){
         this.scrollData= {
             currentScroll : 0,
@@ -187,31 +193,21 @@ export class application{
             this.renderingData.fpsAccumulator = 0;
         }
     }
-    construct_Navigator(){
-        this.navigator =  new Navigator(THREE,this.scene,this.gui);
 
-    }
 
     updateCamera(deltaTime){
         this.Flying_Camera_Controls.enableZoom = this.cameraData.enableZoom;
 
     }
-    updateNavigator(deltaTime,deltaScroll){
-        this.navigator.Update(deltaTime,deltaScroll);
-    }
+
 
 
     update(deltaTime){
-        const deltascroll =  (this.scrollData.targetScroll - this.scrollData.currentScroll) * this.scrollData.LERP_FACTOR;
-        this.scrollData.currentScroll +=deltascroll;
-        this.updateFPS(deltaTime);
-        this.updateCamera(deltaTime);
-        this.updateNavigator(deltaTime,deltascroll);
-        this.renderer.render(this.scene, this.cameraData.currentCamera);
-
+        // In WebXR, we use setAnimationLoop instead of requestAnimationFrame
+        this.renderer.setAnimationLoop(() => {
+            this.renderer.render(this.scene, this.Cam);
+        });
     }
-    Reset(){
-        this.navigator.ResetMvt();
-    }
+    
 }
     

@@ -9,7 +9,7 @@ import {application } from "./app.js";
 
 
 const app = new application();
-await app.initialize();
+// await app.initialize();
 
 
 
