@@ -5,30 +5,22 @@ import * as GUI from 'lilGUI';
 import { VRButton } from 'three/webxr/VRButton.js';
 import { AssemblyManager } from './AssemblyManager.js';
 import { AnimatedModelManager } from './AnimatedModelManager.js';
-import { ModelLoader } from './ModelLoader.js';
+
 
 
 
 
 export class application{
     constructor(){
-        this.construct_scene_And_Renderer()
+        this.construct_Gui(); // Create GUI first
+        this.construct_scene_And_Renderer();
         this.construct_camera();
-        this.construct_Gui();
         this.construct_Loaders();
-        
-        // Initialize AssemblyManager (runs alongside Navigator for now)
-        this.assembly_manager = new AssemblyManager(THREE, this.scene, this.gui);
-        this.assembly_manager.initialize(
-            '../jsons/ConfigJson/ModelLoader.json',
-            '../jsons/ConfigJson/AssemblyManager.json'
-        ).catch(console.error);
 
-        // Initialize AnimatedModelManager to load a GLB directly from assets (fallback to assets/drone.glb)
+        // Initialize AnimatedModelManager to load a GLB directly from assets
         this.animated_manager = new AnimatedModelManager(THREE, this.scene, this.gui);
-        this.animated_manager.initialize('../jsons/ConfigJson/ModelLoader.json').catch(err => {
-            // initialization will fallback to loading assets/drone.glb if ModelLoader JSON isn't present
-            console.warn('AnimatedModelManager initialization warning:', err);
+        this.animated_manager.initialize('assets/drone.glb').catch(err => {
+            console.warn('AnimatedModelManager: Failed to load drone model:', err);
         });
     }
 
@@ -40,39 +32,58 @@ export class application{
     construct_scene_And_Renderer(){
         //--------this.scene--------
         this.scene = new THREE.Scene();
-        
-        this.scene.background = new THREE.Color(0xAAAAAA);
-        
+
+        // Load a cube map as the background
+        const loader = new THREE.CubeTextureLoader();
+        // Example: expects 6 images named px, nx, py, ny, pz, nz in assets/cubemap/
+        const cubeTexture = loader.load([
+            'assets/cubemap/px.jpg',
+            'assets/cubemap/nx.jpg',
+            'assets/cubemap/py.jpg',
+            'assets/cubemap/ny.jpg',
+            'assets/cubemap/pz.jpg',
+            'assets/cubemap/nz.jpg',
+        ]);
+        this.scene.background = cubeTexture;
+
         //--------Axis and Grid Debuggers------
-        
-        const axesHelper = new THREE.AxesHelper( 22 );
-        this.scene.add( axesHelper );
-        
-        
+        const axesHelper = new THREE.AxesHelper(22);
+        this.scene.add(axesHelper);
+
         const GridHelpersize = 200;
         const Gridhelperdivisions = 200;
-        
-        const gridHelper = new THREE.GridHelper( GridHelpersize, Gridhelperdivisions );
-        this.scene.add( gridHelper );
+        const gridHelper = new THREE.GridHelper(GridHelpersize, Gridhelperdivisions);
+        this.scene.add(gridHelper);
         const GridHelpersize2 = 200;
         const Gridhelperdivisions2 = 20;
-        
-        const gridHelper2 = new THREE.GridHelper( GridHelpersize2, Gridhelperdivisions2,0x000000,0x000000 );
-        this.scene.add( gridHelper2 );
+        const gridHelper2 = new THREE.GridHelper(GridHelpersize2, Gridhelperdivisions2, 0x000000, 0x000000);
+        this.scene.add(gridHelper2);
 
         this.AddLight_To_scene();
-        
+
         //--------Renderer------
+        this.renderer = new THREE.WebGLRenderer({ 
+            alpha: true, 
+            antialias: true,
+            powerPreference: "high-performance"
+        });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.0;
+        this.renderer.physicallyCorrectLights = true;
         
-        this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
-        this.renderer.setSize( window.innerWidth, window.innerHeight );
-        this.canvas=this.renderer.domElement;
-        document.body.appendChild( this.canvas);
-        
+        this.canvas = this.renderer.domElement;
+        document.body.appendChild(this.canvas);
+
         // Enable WebXR
         this.renderer.xr.enabled = true;
-        document.body.appendChild( VRButton.createButton(this.renderer) );
+        document.body.appendChild(VRButton.createButton(this.renderer));
         
+        // Setup lighting GUI controls after renderer is created
+        this.setupLightingGUI();
     }
 
 
@@ -92,10 +103,14 @@ export class application{
 
 
     construct_Gui(){
-        this.gui=new GUI.GUI();
-        this.gui.add(document, 'title');
-        // this.AddRenderingFolder();
-        // this.AddCameraFolder();
+        try {
+            this.gui = new GUI.GUI();
+            this.gui.add(document, 'title');
+            console.log('GUI initialized successfully');
+        } catch (error) {
+            console.warn('Failed to initialize GUI:', error);
+            this.gui = null;
+        }
     }
 
 
@@ -128,32 +143,53 @@ export class application{
     }
 
     async construct_Loaders(){
-        // Initialize ModelLoader with THREE and GUI
-        this.Model_Loader = new ModelLoader(THREE, this.gui);
-        
-        // Initialize with config file
-        await this.Model_Loader.initialize('../jsons/ConfigJson/ModelLoader.json').catch(err => {
-            console.warn('ModelLoader initialization warning:', err);
-            // Continue execution - AnimatedModelManager will fallback to default GLB
-        });
+        // Only AnimatedModelManager is used for model loading and animation
     }
 
 
     AddLight_To_scene(){
-        const ambienLight_Color = 0xffffff;
-        const ambienLight_Intensity = 4;
-
-        this.ambientLight = new THREE.AmbientLight(ambienLight_Color, ambienLight_Intensity); // Soft white light
+        // Ambient light for general illumination
+        this.ambientLight = new THREE.AmbientLight(0x404040, 1); // Subtle ambient light
         this.scene.add(this.ambientLight);
 
-        const directionalLight_Color = 0xffffff;
-        const directionalLight_Intensity = 8;
-        const directionalLight_Position = new THREE.Vector3(20, 18.5, -3.5);
-
-        
-        this.directionalLight = new THREE.DirectionalLight(directionalLight_Color, directionalLight_Intensity);
-        this.directionalLight.position.set(directionalLight_Position); // Position it to shine from the top-right-front
+        // Main directional light (sun-like)
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+        this.directionalLight.position.set(5, 5, 5);
+        this.directionalLight.castShadow = true;
+        this.directionalLight.shadow.mapSize.width = 2048;
+        this.directionalLight.shadow.mapSize.height = 2048;
+        this.directionalLight.shadow.camera.near = 0.5;
+        this.directionalLight.shadow.camera.far = 50;
+        this.directionalLight.shadow.bias = -0.0001;
         this.scene.add(this.directionalLight);
+
+        // Add some fill lights for better material definition
+        const fillLight1 = new THREE.PointLight(0x9ca3af, 2);
+        fillLight1.position.set(-5, 2, 2);
+        this.scene.add(fillLight1);
+
+        const fillLight2 = new THREE.PointLight(0x9ca3af, 1);
+        fillLight2.position.set(5, -2, -2);
+        this.scene.add(fillLight2);
+
+        // Add subtle hemisphere light for ambient occlusion-like effect
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+        this.scene.add(hemiLight);
+    }
+
+    setupLightingGUI() {
+        if (this.gui && this.renderer) {
+            const lightingFolder = this.gui.addFolder('Lighting');
+            
+            lightingFolder.add(this.directionalLight, 'intensity', 0, 10, 0.1).name('Main Light');
+            lightingFolder.add(this.ambientLight, 'intensity', 0, 5, 0.1).name('Ambient');
+            lightingFolder.add(this.renderer, 'toneMappingExposure', 0, 2, 0.01).name('Exposure');
+            
+            const lightPos = lightingFolder.addFolder('Main Light Position');
+            lightPos.add(this.directionalLight.position, 'x', -10, 10, 0.1);
+            lightPos.add(this.directionalLight.position, 'y', -10, 10, 0.1);
+            lightPos.add(this.directionalLight.position, 'z', -10, 10, 0.1);
+        }
     }
 
     Initialise_Data(){
@@ -202,10 +238,7 @@ export class application{
     update(deltaTime){
         // In WebXR, we use setAnimationLoop instead of requestAnimationFrame
         this.renderer.setAnimationLoop(() => {
-            // Update assembly animations if manager exists
-            if (this.assembly_manager) {
-                this.assembly_manager.update(deltaTime);
-            }
+            // Update animated model
             if (this.animated_manager) {
                 this.animated_manager.update(deltaTime);
             }

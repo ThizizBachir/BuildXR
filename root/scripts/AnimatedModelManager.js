@@ -1,4 +1,3 @@
-import { ModelLoader } from './ModelLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export class AnimatedModelManager {
@@ -6,53 +5,57 @@ export class AnimatedModelManager {
         this.THREE = THREE;
         this.scene = scene;
         this.gui = gui;
-        this.model_loader = new ModelLoader(THREE, gui);
-        
         this.animations = new Map(); // Store AnimationMixer and clips
         this.current_model = null;
         this.mixer = null;
-    this._currentAction = null;
-
+        this._currentAction = null;
         if (gui) this.setupDebugUI();
     }
 
     /**
      * Initialize with a GLTF/GLB model containing animations
-     * @param {string} modelConfigPath - Path to ModelLoader.json
+     * @param {string} modelPath - Path to the GLB/GLTF file
      */
-    async initialize(modelConfigPath) {
-        // Try to initialize via ModelLoader JSON first (if provided)
-        let loadedViaModelLoader = false;
+    async initialize(modelPath = 'assets/drone.glb') {
+        console.log('AnimatedModelManager: Loading model from:', modelPath);
         try {
-            await this.model_loader.initialize(modelConfigPath);
-            // Create instance of the animated model (name used in ModelLoader JSON)
-            this.current_model = this.model_loader.createInstance('AssemblyModel', {
-                position: { x: 0, y: 0, z: 0 },
-                scale: { x: 1, y: 1, z: 1 }
-            });
-
-            if (this.current_model) {
-                this.scene.add(this.current_model);
-                this.mixer = new this.THREE.AnimationMixer(this.current_model);
-
-                // If ModelLoader attached animations to the instance, collect them
-                if (this.current_model.animations) {
-                    this.current_model.animations.forEach(clip => this.animations.set(clip.name, clip));
-                }
-
-                loadedViaModelLoader = true;
+            const response = await fetch(modelPath);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+            await this.loadGLBFromAssets(modelPath);
+            console.log('AnimatedModelManager: Model loaded successfully');
         } catch (e) {
-            console.warn('AnimatedModelManager: ModelLoader JSON not present or failed, falling back to direct GLB load.', e);
-        }
-
-        // Fallback: if ModelLoader didn't provide a model, try loading a GLB directly from assets (e.g. assets/drone.glb)
-        if (!loadedViaModelLoader) {
-            try {
-                await this.loadGLBFromAssets('assets/drone.glb');
-            } catch (e) {
-                console.error('AnimatedModelManager: Failed to load GLB fallback', e);
-            }
+            console.error('AnimatedModelManager: Failed to load GLB from ' + modelPath, e);
+            console.log('Creating fallback cube...');
+            
+            // Create a fallback cube so we can see something
+            const geometry = new this.THREE.BoxGeometry(2, 2, 2);
+            const material = new this.THREE.MeshPhongMaterial({ 
+                color: 0x00ff00,
+                wireframe: true
+            });
+            this.current_model = new this.THREE.Mesh(geometry, material);
+            this.scene.add(this.current_model);
+            
+            // Create a simple rotation animation for the cube
+            const rotationClip = new this.THREE.AnimationClip('rotate', 1, [
+                new this.THREE.VectorKeyframeTrack(
+                    '.rotation[y]',
+                    [0, 1],
+                    [0, Math.PI * 2]
+                )
+            ]);
+            
+            this.mixer = new this.THREE.AnimationMixer(this.current_model);
+            const action = this.mixer.clipAction(rotationClip);
+            action.setLoop(this.THREE.LoopRepeat);
+            action.play();
+            
+            this.animations.set('rotate', rotationClip);
+            
+            // Don't throw the error since we've handled it with a fallback
+            console.log('Fallback cube created with rotation animation');
         }
     }
 
@@ -180,6 +183,9 @@ export class AnimatedModelManager {
             loader.load(path, (gltf) => {
                 const model = gltf.scene || gltf.scenes[0];
                 if (!model) return reject(new Error('GLTF contains no scene'));
+
+                // Scale the model by 2x
+                model.scale.set(2, 2, 2);
 
                 // Attach animations from gltf
                 if (gltf.animations && gltf.animations.length > 0) {
