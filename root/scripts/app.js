@@ -2,26 +2,33 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as GUI from 'lilGUI';
-import { Navigator } from './Navigator.js';
+import { VRButton } from 'three/webxr/VRButton.js';
+import { AssemblyManager } from './AssemblyManager.js';
+import { AnimatedModelManager } from './AnimatedModelManager.js';
+import { OutlineManager } from './OutlineManager.js';
+
 
 
 
 
 export class application{
     constructor(){
-        this.construct_scene_And_Renderer()
+        this.construct_Gui(); // Create GUI first
+        this.construct_scene_And_Renderer();
         this.construct_camera();
-        this.Initialise_Data();
-        this.construct_Gui();
-        this.construct_Navigator();
+        
+        // Initialize OutlineManager for post-processing effects
+        this.outlineManager = new OutlineManager(this.scene, this.Cam, this.renderer, this.gui);
+        
+        this.construct_Loaders();
 
-
+        // Initialize AnimatedModelManager to load a GLB directly from assets
+        this.animated_manager = new AnimatedModelManager(THREE, this.scene, this.gui);
+        this.animated_manager.initialize('assets/drone.glb').catch(err => {
+            console.warn('AnimatedModelManager: Failed to load drone model:', err);
+        });
     }
-    async initialize(){
-        await this.navigator.initialize(this.Flying_Camera,this.canvas,this.Flying_Camera_Controls);
-        this.following_Camera = this.navigator.FCam.cam;
 
-    }
 
 
 
@@ -30,37 +37,58 @@ export class application{
     construct_scene_And_Renderer(){
         //--------this.scene--------
         this.scene = new THREE.Scene();
-        
-        this.scene.background = new THREE.Color(0xAAAAAA);
-        
+
+        // Load a cube map as the background
+        const loader = new THREE.CubeTextureLoader();
+        // Example: expects 6 images named px, nx, py, ny, pz, nz in assets/cubemap/
+        const cubeTexture = loader.load([
+            'assets/cubemap/px.jpg',
+            'assets/cubemap/nx.jpg',
+            'assets/cubemap/py.jpg',
+            'assets/cubemap/ny.jpg',
+            'assets/cubemap/pz.jpg',
+            'assets/cubemap/nz.jpg',
+        ]);
+        this.scene.background = cubeTexture;
+
         //--------Axis and Grid Debuggers------
-        
-        const axesHelper = new THREE.AxesHelper( 22 );
-        this.scene.add( axesHelper );
-        
-        
+        const axesHelper = new THREE.AxesHelper(22);
+        this.scene.add(axesHelper);
+
         const GridHelpersize = 200;
         const Gridhelperdivisions = 200;
-        
-        const gridHelper = new THREE.GridHelper( GridHelpersize, Gridhelperdivisions );
-        this.scene.add( gridHelper );
+        const gridHelper = new THREE.GridHelper(GridHelpersize, Gridhelperdivisions);
+        this.scene.add(gridHelper);
         const GridHelpersize2 = 200;
         const Gridhelperdivisions2 = 20;
-        
-        const gridHelper2 = new THREE.GridHelper( GridHelpersize2, Gridhelperdivisions2,0x000000,0x000000 );
-        this.scene.add( gridHelper2 );
+        const gridHelper2 = new THREE.GridHelper(GridHelpersize2, Gridhelperdivisions2, 0x000000, 0x000000);
+        this.scene.add(gridHelper2);
 
         this.AddLight_To_scene();
-        
-        //--------Renderer------
-        
-        this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
-        this.renderer.setSize( window.innerWidth, window.innerHeight );
-        this.canvas=this.renderer.domElement;
-        document.body.appendChild( this.canvas);
-        
-        
 
+        //--------Renderer------
+        this.renderer = new THREE.WebGLRenderer({ 
+            alpha: true, 
+            antialias: true,
+            powerPreference: "high-performance"
+        });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.0;
+        this.renderer.physicallyCorrectLights = true;
+        
+        this.canvas = this.renderer.domElement;
+        document.body.appendChild(this.canvas);
+
+        // Enable WebXR
+        this.renderer.xr.enabled = true;
+        document.body.appendChild(VRButton.createButton(this.renderer));
+        
+        // Setup lighting GUI controls after renderer is created
+        this.setupLightingGUI();
     }
 
 
@@ -69,84 +97,109 @@ export class application{
         const aspect = window.innerWidth / window.innerHeight;
         const near = 0.1;
         const far = 1000;
-        this.Flying_Camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-        this.Flying_Camera.position.set(0, 6.5 ,2);
-        this.Flying_Camera.lookAt(0, 0, 0);
+        this.Cam = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        this.Cam.position.set(0, 6.5 ,2);
+        this.Cam.lookAt(0, 0, 0);
 
-        this.Flying_Camera_Controls = new OrbitControls(this.Flying_Camera, this.canvas);
-
-
-        this.following_Camera = null;
+        this.Cam_Controls = new OrbitControls(this.Cam, this.canvas);
+        this.Cam_Controls.enableDamping = true; 
 
     }
+
+
     construct_Gui(){
-        this.gui=new GUI.GUI();
-        this.gui.add(document, 'title');
-        this.AddScrollFolder();
-        this.AddRenderingFolder();
-        this.AddCameraFolder();
+        try {
+            this.gui = new GUI.GUI();
+            this.gui.add(document, 'title');
+            console.log('GUI initialized successfully');
+        } catch (error) {
+            console.warn('Failed to initialize GUI:', error);
+            this.gui = null;
+        }
+    }
 
-    }
-    AddScrollFolder(){
-        const ScrollFolder = this.gui.addFolder('Scroll Control');
-        ScrollFolder.add(this.scrollData, 'currentScroll').name('current_scroll').listen();
-        ScrollFolder.add(this.scrollData, 'targetScroll').name('target_scroll').listen();
-    }
+
+
+
     AddRenderingFolder(){
         const renderingFolder = this.gui.addFolder('Rendering Data');
         renderingFolder.add(this.renderingData, 'fps').name('FPS').listen();
     }
+
+
     AddCameraFolder(){
         const cameraFolder = this.gui.addFolder('Camera Control');
         cameraFolder.add(this.cameraData, 'enableZoom').name('enableZoom').listen();
         cameraFolder.add(this.cameraData, 'enableScroll').name('enableScroll').listen();
-        cameraFolder.add(this.cameraData, 'Mode', ['Flying', 'Follower']).name('Mode').listen()
+        cameraFolder.add(this.cameraData, 'Mode', ['Flying']).name('Mode').listen()
             .onChange(val => {
                 if (val === 'Flying') {
-                this.cameraData.currentCamera = this.Flying_Camera  ;
+                this.cameraData.currentCamera = this.Flying_Camera;
                 this.Flying_Camera_Controls.enableZoom = true;
-                this.cameraData.enableScroll = false;
                 this.cameraData.enableZoom = true;
                 }
-                else if (val=== 'Follower'){
-                this.cameraData.currentCamera = this.following_Camera;
+                else if (val === 'Follower') {
+                // Following camera mode removed - now using WebXR
                 this.Flying_Camera_Controls.enableZoom = false;
                 this.cameraData.enableZoom = false;
-                this.cameraData.enableScroll = true;
                 }
             });
         cameraFolder.add(this, 'Reset').name('Reset');
     }
 
     async construct_Loaders(){
-        this.fbxLoader = new FBXLoader();
-        this.textureLoader = new THREE.TextureLoader();
-        this.Model_Loader =  new ModelLoader(THREE,this.fbxLoader,this.textureLoader,this.gui);
-        await this.Model_Loader.ready;
+        // Only AnimatedModelManager is used for model loading and animation
     }
-    AddLight_To_scene(){
-        const ambienLight_Color = 0xffffff;
-        const ambienLight_Intensity = 4;
 
-        this.ambientLight = new THREE.AmbientLight(ambienLight_Color, ambienLight_Intensity); // Soft white light
+
+    AddLight_To_scene(){
+        // Ambient light for general illumination
+        this.ambientLight = new THREE.AmbientLight(0x404040, 1); // Subtle ambient light
         this.scene.add(this.ambientLight);
 
-        const directionalLight_Color = 0xffffff;
-        const directionalLight_Intensity = 8;
-        const directionalLight_Position = new THREE.Vector3(20, 18.5, -3.5);
-
-        
-        this.directionalLight = new THREE.DirectionalLight(directionalLight_Color, directionalLight_Intensity);
-        this.directionalLight.position.set(directionalLight_Position); // Position it to shine from the top-right-front
+        // Main directional light (sun-like)
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+        this.directionalLight.position.set(5, 5, 5);
+        this.directionalLight.castShadow = true;
+        this.directionalLight.shadow.mapSize.width = 2048;
+        this.directionalLight.shadow.mapSize.height = 2048;
+        this.directionalLight.shadow.camera.near = 0.5;
+        this.directionalLight.shadow.camera.far = 50;
+        this.directionalLight.shadow.bias = -0.0001;
         this.scene.add(this.directionalLight);
-    }
-    Initialise_Data(){
-        this.scrollData= {
-            currentScroll : 0,
-            targetScroll : 0,
-            LERP_FACTOR : 0.08,
-        }
 
+        // Add some fill lights for better material definition
+        const fillLight1 = new THREE.PointLight(0x9ca3af, 2);
+        fillLight1.position.set(-5, 2, 2);
+        this.scene.add(fillLight1);
+
+        const fillLight2 = new THREE.PointLight(0x9ca3af, 1);
+        fillLight2.position.set(5, -2, -2);
+        this.scene.add(fillLight2);
+
+        // Add subtle hemisphere light for ambient occlusion-like effect
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+        this.scene.add(hemiLight);
+    }
+
+    setupLightingGUI() {
+        if (this.gui && this.renderer) {
+            const lightingFolder = this.gui.addFolder('Lighting');
+            
+            lightingFolder.add(this.directionalLight, 'intensity', 0, 10, 0.1).name('Main Light');
+            lightingFolder.add(this.ambientLight, 'intensity', 0, 5, 0.1).name('Ambient');
+            lightingFolder.add(this.renderer, 'toneMappingExposure', 0, 2, 0.01).name('Exposure');
+            
+            const lightPos = lightingFolder.addFolder('Main Light Position');
+            lightPos.add(this.directionalLight.position, 'x', -10, 10, 0.1);
+            lightPos.add(this.directionalLight.position, 'y', -10, 10, 0.1);
+            lightPos.add(this.directionalLight.position, 'z', -10, 10, 0.1);
+        }
+    }
+
+
+
+    Initialise_Data(){
         this.renderingData= {
             prevTime : 0,
 
@@ -164,19 +217,12 @@ export class application{
         this.cameraData ={
             currentCamera : this.Flying_Camera,
             enableZoom : true,
-            enableScroll: false,
-            Mode : "Flying",// Flying, Follower
+            Mode : "Flying"// Flying, Follower
 
         }
     }
 
-    listen_to_Scroll(deltaY){
-        if(this.cameraData.enableScroll){
-            const scrollFactor = 0.002;
-            this.scrollData.targetScroll += deltaY*scrollFactor;
-        }
 
-    }
     updateFPS(delta) {
         this.renderingData.frameCount++;
         this.renderingData.fpsAccumulator += delta;
@@ -187,31 +233,50 @@ export class application{
             this.renderingData.fpsAccumulator = 0;
         }
     }
-    construct_Navigator(){
-        this.navigator =  new Navigator(THREE,this.scene,this.gui);
 
-    }
 
     updateCamera(deltaTime){
         this.Flying_Camera_Controls.enableZoom = this.cameraData.enableZoom;
 
     }
-    updateNavigator(deltaTime,deltaScroll){
-        this.navigator.Update(deltaTime,deltaScroll);
-    }
+
 
 
     update(deltaTime){
-        const deltascroll =  (this.scrollData.targetScroll - this.scrollData.currentScroll) * this.scrollData.LERP_FACTOR;
-        this.scrollData.currentScroll +=deltascroll;
-        this.updateFPS(deltaTime);
-        this.updateCamera(deltaTime);
-        this.updateNavigator(deltaTime,deltascroll);
-        this.renderer.render(this.scene, this.cameraData.currentCamera);
+        // In WebXR, we use setAnimationLoop instead of requestAnimationFrame
+        this.renderer.setAnimationLoop(() => {
+            // Update animated model
+            if (this.animated_manager) {
+                this.animated_manager.update(deltaTime);
+                
+                // Update selected objects for outline
+                if (this.animated_manager.current_model) {
+                    // Use OutlineManager to selectively outline meshes
+                    // To outline all meshes:
+                    this.outlineManager.setSelectiveMeshes(this.animated_manager.current_model);
+                    
+                    // To outline only specific meshes (example - uncomment and modify as needed):
+                    // this.outlineManager.setSelectiveMeshes(
+                    //     this.animated_manager.current_model,
+                    //     (mesh) => mesh.name.includes('propeller') || mesh.name.includes('body')
+                    // );
+                }
+            }
+            
+            // Handle XR rendering
+            if (this.renderer.xr.isPresenting) {
+                this.renderer.render(this.scene, this.Cam);
+            } else {
+                // Use OutlineManager to render with post-processing
+                this.outlineManager.render();
+            }
 
+            // Update controls if they exist
+            if (this.Cam_Controls) {
+                this.Cam_Controls.update();
+            }
+        });
     }
-    Reset(){
-        this.navigator.ResetMvt();
-    }
+    
 }
     
