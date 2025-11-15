@@ -5,6 +5,7 @@ import * as GUI from 'lilGUI';
 import { VRButton } from 'three/webxr/VRButton.js';
 import { AssemblyManager } from './AssemblyManager.js';
 import { AnimatedModelManager } from './AnimatedModelManager.js';
+import { OutlineManager } from './OutlineManager.js';
 
 
 
@@ -15,6 +16,10 @@ export class application{
         this.construct_Gui(); // Create GUI first
         this.construct_scene_And_Renderer();
         this.construct_camera();
+        
+        // Initialize OutlineManager for post-processing effects
+        this.outlineManager = new OutlineManager(this.scene, this.Cam, this.renderer, this.gui);
+        
         this.construct_Loaders();
 
         // Initialize AnimatedModelManager to load a GLB directly from assets
@@ -192,6 +197,8 @@ export class application{
         }
     }
 
+
+
     Initialise_Data(){
         this.renderingData= {
             prevTime : 0,
@@ -241,9 +248,33 @@ export class application{
             // Update animated model
             if (this.animated_manager) {
                 this.animated_manager.update(deltaTime);
+                
+                // Update selected objects for outline
+                if (this.animated_manager.current_model) {
+                    // Use OutlineManager to selectively outline meshes
+                    // To outline all meshes:
+                    this.outlineManager.setSelectiveMeshes(this.animated_manager.current_model);
+                    
+                    // To outline only specific meshes (example - uncomment and modify as needed):
+                    // this.outlineManager.setSelectiveMeshes(
+                    //     this.animated_manager.current_model,
+                    //     (mesh) => mesh.name.includes('propeller') || mesh.name.includes('body')
+                    // );
+                }
             }
             
-            this.renderer.render(this.scene, this.Cam);
+            // Handle XR rendering
+            if (this.renderer.xr.isPresenting) {
+                this.renderer.render(this.scene, this.Cam);
+            } else {
+                // Use OutlineManager to render with post-processing
+                this.outlineManager.render();
+            }
+
+            // Update controls if they exist
+            if (this.Cam_Controls) {
+                this.Cam_Controls.update();
+            }
         });
     }
     
