@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Contextual Cards Test</title>
+    <meta name="description" content="Test environment for ContextualCardManager" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+      canvas {
+        display: block;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 5px;
+        font-size: 14px;
+        max-width: 300px;
+        z-index: 100;
+      }
+      #info h3 {
+        margin: 0 0 10px 0;
+      }
+      #info p {
+        margin: 5px 0;
+      }
+      .instruction {
+        color: #90EE90;
+      }
+      .distance {
+        color: #FFD700;
+      }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/",
+        "lilGUI" : "https://cdn.jsdelivr.net/npm/lil-gui@0.20/+esm"
+      } 
+    }
+    </script>
+    <script type="module" src="./scripts/test-contextual-cards.js" defer="defer"></script>
+  </head>
+  <body>
+    <div id="info">
+      <h3>Contextual Cards Test</h3>
+      <p><span class="instruction">Move around the objects</span></p>
+      <p><span class="instruction">Get within 2 meters to see cards</span></p>
+      <p><span class="distance" id="distance-info">Distance: -- m</span></p>
+      <p id="card-status">Card Status: Hidden</p>
+      <hr style="margin: 10px 0; opacity: 0.5;">
+      <p><strong>Controls:</strong></p>
+      <p>Right Mouse: Rotate</p>
+      <p>Scroll: Zoom</p>
+    </div>
+  </body>
+</html>
