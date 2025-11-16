@@ -8,3 +8,32 @@ canvas {
    width: 100%;
    height: 80%;
 }
+
+.camera-root {
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* put camera behind the rest of the UI/Three canvas */
+  overflow: hidden;
+  background: #000;
+}
+
+/* make video hidden (we draw from video to canvas). Keep video element for stream only. */
+#cameraVideo {
+  display: none;
+}
+
+/* canvas below your XR/three canvas — adjust z-index if your three renderer should be above or below */
+#cameraCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* behind WebGL canvas so 3D scene is visible on top */
+  object-fit: cover;
+  touch-action: none;
+  pointer-events: none;
+}
+
+/* ensure your app's renderer (if any) is above the camera canvas; if your renderer uses a canvas with id rendererCanvas,
+   set its z-index higher than 0 (e.g. z-index: 1). */
