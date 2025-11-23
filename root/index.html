@@ -9,9 +9,17 @@
     <meta name="author" content="end3r" />
     <meta name="theme-color" content="#B12A34" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!--<link rel="icon" href="favicon.ico" />-->
+
+    <!-- PWA: manifest + icons -->
+    <link rel="manifest" href="./xr-demo.webmanifest" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
     <link rel="stylesheet" href="styles/style.css" />
-    <!--link rel="manifest" href="xr-demo.webmanifest" /-->
     <script type="importmap">
     {
       "imports": {
@@ -19,10 +27,24 @@
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/",
         "lilGUI" : "https://cdn.jsdelivr.net/npm/lil-gui@0.20/+esm",
         "three/webxr/": "https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/webxr/"
-      } 
+      }
     }
     </script>
-<script type="module" src="./scripts/main.js" defer="defer"></script>
+
+    <script>
+      // register service worker for this app folder
+      if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+        navigator.serviceWorker.register('./sw.js').then(function(reg){
+          console.log('ServiceWorker registered', reg);
+        }).catch(function(err){
+          console.warn('SW registration failed:', err);
+        });
+      } else {
+        console.warn('ServiceWorker not registered (needs https or localhost)');
+      }
+    </script>
+
+    <script type="module" src="./scripts/main.js" defer="defer"></script>
   </head>
   <body>
   </body>
