@@ -24,9 +24,13 @@ export class application{
 
         // Initialize AnimatedModelManager to load a GLB directly from assets
         this.animated_manager = new AnimatedModelManager(THREE, this.scene, this.gui);
-        this.animated_manager.initialize('assets/drone.glb').catch(err => {
-            console.warn('AnimatedModelManager: Failed to load drone model:', err);
-        });
+        this.animated_manager.initialize('assets/gun-bot_with_walk_and_idle_animation.glb')
+            .then(() => {
+                this.setupAnimationButtons();
+            })
+            .catch(err => {
+                console.warn('AnimatedModelManager: Failed to load gun-bot model:', err);
+            });
     }
 
 
@@ -100,6 +104,13 @@ export class application{
         this.Cam = new THREE.PerspectiveCamera(fov, aspect, near, far);
         this.Cam.position.set(0, 6.5 ,2);
         this.Cam.lookAt(0, 0, 0);
+
+        // Add a spotlight that follows the camera
+        this.spotLight = new THREE.SpotLight(0xffffff, 0.8, 20, Math.PI / 9, 0.25, 1);
+        this.spotLight.position.set(0, 0, 0.5); // Positioned slightly in front of the camera
+        this.spotLight.castShadow = true;
+        this.Cam.add(this.spotLight);
+        this.scene.add(this.Cam); // Add camera to the scene so the light is included
 
         this.Cam_Controls = new OrbitControls(this.Cam, this.canvas);
         this.Cam_Controls.enableDamping = true; 
@@ -278,5 +289,28 @@ export class application{
         });
     }
     
+    setupAnimationButtons() {
+        if (this.gui && this.animated_manager && this.animated_manager.animations.size > 0) {
+            const animFolder = this.gui.addFolder('Bot Animations');
+            const animations = {
+                playIdle: () => this.animated_manager.playAnimation('Idel_Animation', true),
+                playWalk: () => this.animated_manager.playAnimation('Walkcycle_Animation', true),
+                playDefault: () => this.animated_manager.playAnimation('Default Take', true),
+                stop: () => this.animated_manager.stopAnimations()
+            };
+
+            if (this.animated_manager.animations.has('Idel_Animation')) {
+                animFolder.add(animations, 'playIdle').name('Play Idle');
+            }
+            if (this.animated_manager.animations.has('Walkcycle_Animation')) {
+                animFolder.add(animations, 'playWalk').name('Play Walk');
+            }
+            if (this.animated_manager.animations.has('Default Take')) {
+                animFolder.add(animations, 'playDefault').name('Play Default Take');
+            }
+            animFolder.add(animations, 'stop').name('Stop Animations');
+        }
+    }
+
 }
-    
+
