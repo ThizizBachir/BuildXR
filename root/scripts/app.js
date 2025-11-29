@@ -20,7 +20,6 @@ export class application{
         // Initialize OutlineManager for post-processing effects
         this.outlineManager = new OutlineManager(this.scene, this.Cam, this.renderer, this.gui);
         
-        this.construct_Loaders();
 
         // Initialize AnimatedModelManager to load a GLB directly from assets
         this.animated_manager = new AnimatedModelManager(THREE, this.scene, this.gui);
@@ -92,7 +91,7 @@ export class application{
         document.body.appendChild(VRButton.createButton(this.renderer));
         
         // Setup lighting GUI controls after renderer is created
-        this.setupLightingGUI();
+        // this.setupLightingGUI();
     }
 
 
@@ -105,12 +104,7 @@ export class application{
         this.Cam.position.set(0, 6.5 ,2);
         this.Cam.lookAt(0, 0, 0);
 
-        // Add a spotlight that follows the camera
-        this.spotLight = new THREE.SpotLight(0xffffff, 0.8, 20, Math.PI / 9, 0.25, 1);
-        this.spotLight.position.set(0, 0, 0.5); // Positioned slightly in front of the camera
-        this.spotLight.castShadow = true;
-        this.Cam.add(this.spotLight);
-        this.scene.add(this.Cam); // Add camera to the scene so the light is included
+        // correcting camera lightning
 
         this.Cam_Controls = new OrbitControls(this.Cam, this.canvas);
         this.Cam_Controls.enableDamping = true; 
@@ -129,55 +123,21 @@ export class application{
         }
     }
 
-
-
-
-    AddRenderingFolder(){
-        const renderingFolder = this.gui.addFolder('Rendering Data');
-        renderingFolder.add(this.renderingData, 'fps').name('FPS').listen();
-    }
-
-
-    AddCameraFolder(){
-        const cameraFolder = this.gui.addFolder('Camera Control');
-        cameraFolder.add(this.cameraData, 'enableZoom').name('enableZoom').listen();
-        cameraFolder.add(this.cameraData, 'enableScroll').name('enableScroll').listen();
-        cameraFolder.add(this.cameraData, 'Mode', ['Flying']).name('Mode').listen()
-            .onChange(val => {
-                if (val === 'Flying') {
-                this.cameraData.currentCamera = this.Flying_Camera;
-                this.Flying_Camera_Controls.enableZoom = true;
-                this.cameraData.enableZoom = true;
-                }
-                else if (val === 'Follower') {
-                // Following camera mode removed - now using WebXR
-                this.Flying_Camera_Controls.enableZoom = false;
-                this.cameraData.enableZoom = false;
-                }
-            });
-        cameraFolder.add(this, 'Reset').name('Reset');
-    }
-
-    async construct_Loaders(){
-        // Only AnimatedModelManager is used for model loading and animation
-    }
+    // deleted unecessary folders from GUI for clarity
+   
 
 
     AddLight_To_scene(){
         // Ambient light for general illumination
-        this.ambientLight = new THREE.AmbientLight(0x404040, 1); // Subtle ambient light
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 2); // Subtle ambient light
         this.scene.add(this.ambientLight);
 
         // Main directional light (sun-like)
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-        this.directionalLight.position.set(5, 5, 5);
-        this.directionalLight.castShadow = true;
-        this.directionalLight.shadow.mapSize.width = 2048;
-        this.directionalLight.shadow.mapSize.height = 2048;
-        this.directionalLight.shadow.camera.near = 0.5;
-        this.directionalLight.shadow.camera.far = 50;
-        this.directionalLight.shadow.bias = -0.0001;
+        this.directionalLight = new THREE.DirectionalLight(0xffffff,3);
+        this.directionalLight.position.set(-6.3, 9.1, -10);
         this.scene.add(this.directionalLight);
+        const helper = new THREE.DirectionalLightHelper( this.directionalLight, 5 );
+        this.scene.add( helper );
 
         // Add some fill lights for better material definition
         const fillLight1 = new THREE.PointLight(0x9ca3af, 2);
@@ -191,6 +151,8 @@ export class application{
         // Add subtle hemisphere light for ambient occlusion-like effect
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
         this.scene.add(hemiLight);
+
+        // corrected ligtning
     }
 
     setupLightingGUI() {
@@ -210,28 +172,6 @@ export class application{
 
 
 
-    Initialise_Data(){
-        this.renderingData= {
-            prevTime : 0,
-
-
-            // FPS cap
-            MAX_FPS : 60,
-            FRAME_DURATION : 1 / 60, // ~0.0167s
-
-            fps: 0,
-
-            frameCount :0,
-            fpsAccumulator :0,
-
-        }
-        this.cameraData ={
-            currentCamera : this.Flying_Camera,
-            enableZoom : true,
-            Mode : "Flying"// Flying, Follower
-
-        }
-    }
 
 
     updateFPS(delta) {
@@ -245,11 +185,6 @@ export class application{
         }
     }
 
-
-    updateCamera(deltaTime){
-        this.Flying_Camera_Controls.enableZoom = this.cameraData.enableZoom;
-
-    }
 
 
 

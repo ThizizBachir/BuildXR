@@ -17,7 +17,7 @@ export class OutlineManager {
         this._setupComposer();
         this._setupOutlinePass();
         if (this.gui) {
-            this.setupOutlineGUI();
+            // this.setupOutlineGUI();
         }
 
         window.addEventListener('resize', this.onWindowResize.bind(this));
