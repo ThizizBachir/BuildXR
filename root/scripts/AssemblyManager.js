@@ -1,41 +1,36 @@
-import { AnimatedModelManager } from './AnimatedModelManager.js';
-
 /**
- * Manages the assembly sequence of 3D parts using splines and triggers.
- * Coordinates ModelLoader for parts and SplineManager for animation paths.
+ * Manages the assembly sequence of 3D parts using step-based approach.
+ * Coordinates outlining, visibility, and staging for step-by-step assembly.
  */
 export class AssemblyManager {
     constructor(THREE, scene, gui) {
         this.THREE = THREE;
         this.scene = scene;
         this.gui = gui;
-        this.animated_manager = new AnimatedModelManager(THREE, scene, gui);
 
         // Current state
         this.current_step = 0;
         this.is_assembling = false;
-        this.parts = new Map(); // kept for backward compatibility but not required
+        this.assembly_config = null;
+        this.loaded_model = null;
 
         if (gui) this.setupDebugUI();
     }
 
     /**
-     * Initialize the assembly manager with configuration JSONs
-     * @param {string} modelConfigPath - Path to ModelLoader.json for animated model (optional)
-     * @param {string} assemblyConfigPath - Path to assembly sequence configuration (maps steps to clip names)
+     * Initialize the assembly manager with configuration and model
+     * @param {string} assemblyConfigPath - Path to assembly sequence configuration (defines steps)
+     * @param {Object3D} model - The loaded drone model (from ModelLoader or direct GLTFLoader)
      */
-    async initialize(modelConfigPath, assemblyConfigPath) {
+    async initialize(assemblyConfigPath, model) {
         try {
             // Load and parse assembly sequence config
             const response = await fetch(assemblyConfigPath);
             if (!response.ok) throw new Error(`Failed to load assembly config: ${response.status}`);
             this.assembly_config = await response.json();
 
-            // Initialize animated model manager (loads GLB via ModelLoader.json or falls back to assets)
-            await this.animated_manager.initialize(modelConfigPath);
-
-            // If the animated manager exposed available clips, notify UI population
-            if (this.animated_manager.onAnimationsLoaded) this.animated_manager.onAnimationsLoaded();
+            // Store model reference
+            this.loaded_model = model;
 
             console.log('AssemblyManager: Initialization complete ✅');
         } catch (error) {
@@ -45,60 +40,32 @@ export class AssemblyManager {
     }
 
     /**
-     * Load initial part instances from the model loader
+     * Start a specific assembly step
+     * @param {string} stepId - The step ID from the config
      */
-    async loadInitialParts() {
-        // Parts are optional when using pre-authored GLB animations; keep this as a no-op for compatibility
-        return;
-    }
-
-    /**
-     * Start the assembly sequence from the beginning or a specific step
-     * @param {number} [step=0] - Optional step number to start from
-     */
-    async startAssembly(step = 0) {
-        if (this.is_assembling) {
-            console.warn('AssemblyManager: Assembly already in progress');
+    startStep(stepId) {
+        if (!this.assembly_config || !this.loaded_model) {
+            console.error('AssemblyManager: Not initialized');
             return;
         }
 
-        this.current_step = step;
-        this.is_assembling = true;
-        
-        try {
-            await this.executeCurrentStep();
-        } catch (error) {
-            console.error('AssemblyManager: Error during assembly', error);
-            this.is_assembling = false;
-        }
-    }
-
-    /**
-     * Execute the current assembly step
-     */
-    async executeCurrentStep() {
-        const step = this.assembly_config.sequence[this.current_step];
+        const step = this.assembly_config.steps.find(s => s.id === stepId);
         if (!step) {
-            console.log('AssemblyManager: Assembly sequence complete! 🎉');
-            this.is_assembling = false;
+            console.error(`AssemblyManager: Step "${stepId}" not found`);
             return;
         }
-        // If the sequence maps to clips, use AnimatedModelManager to play them
-        if (step.clip) {
-            try {
-                await this.animated_manager.playWithCrossfade(step.clip, step.crossfade || 0.25, !!step.loop);
-            } catch (e) {
-                console.error(`AssemblyManager: Failed to play clip '${step.clip}'`, e);
-            }
-        }
 
-        // Advance step
-        this.current_step++;
-        if (this.current_step < this.assembly_config.sequence.length) {
-            await this.executeCurrentStep();
-        } else {
-            this.is_assembling = false;
-        }
+        console.log(`AssemblyManager: Starting step "${stepId}"`);
+        // TODO: Implement step execution (outline, hide, stage)
+        // Will integrate with OutlineManager, VisibilityManager, StagingManager
+    }
+
+    /**
+     * Stop the current step and restore scene
+     */
+    stopStep() {
+        console.log('AssemblyManager: Stopping current step');
+        // TODO: Clear outlines, restore visibility, unstage
     }
 
     /**
@@ -129,31 +96,27 @@ export class AssemblyManager {
         this.is_assembling = false;
         this.current_step = 0;
 
-        // Reset all parts to their initial positions
-        for (const [name, config] of Object.entries(this.assembly_config.parts)) {
-            const part = this.parts.get(name);
-            if (part) {
-                if (config.visible_at_start) {
-                    part.position.copy(config.initial_position);
-                    if (config.initial_rotation) {
-                        part.rotation.copy(config.initial_rotation);
-                    }
-                } else {
-                    // Remove parts that shouldn't be visible at start
-                    this.scene.remove(part);
-                }
-            }
-        }
-    }
+    /**
+     * Set up debug UI controls
+    //  */
+    // setupDebugUI() {
+    //     const folder = this.gui.addFolder('Assembly Steps');
+        
+    //     const controls = {
+    //         currentStep: 'step-01',
+    //         startStep: () => this.startStep(controls.currentStep),
+    //         stopStep: () => this.stopStep()
+    //     };
+
+    //     folder.add(controls, 'currentStep').name('Step ID');
+    //     folder.add(controls, 'startStep').name('Start Step');
+    //     folder.add(controls, 'stopStep').name('Stop Step');
+    // }
 
     /**
      * Update method called each frame
      * @param {number} deltaTime - Time since last frame in seconds
-     */
-    update(deltaTime) {
-        // Update animated model mixer
-        if (this.animated_manager) {
-            this.animated_manager.update(deltaTime);
-        }
-    }
-}
+    //  */
+    // update(deltaTime) {
+    //     // TODO: Update blinking outlines, tweens, etc.
+    }}

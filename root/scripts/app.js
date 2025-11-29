@@ -1,10 +1,8 @@
 import * as THREE from 'three';
-import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as GUI from 'lilGUI';
 import { VRButton } from 'three/webxr/VRButton.js';
-import { AssemblyManager } from './AssemblyManager.js';
-import { AnimatedModelManager } from './AnimatedModelManager.js';
 import { OutlineManager } from './OutlineManager.js';
 
 
@@ -19,17 +17,9 @@ export class application{
         
         // Initialize OutlineManager for post-processing effects
         this.outlineManager = new OutlineManager(this.scene, this.Cam, this.renderer, this.gui);
-        
 
-        // Initialize AnimatedModelManager to load a GLB directly from assets
-        this.animated_manager = new AnimatedModelManager(THREE, this.scene, this.gui);
-        this.animated_manager.initialize('assets/gun-bot_with_walk_and_idle_animation.glb')
-            .then(() => {
-                this.setupAnimationButtons();
-            })
-            .catch(err => {
-                console.warn('AnimatedModelManager: Failed to load gun-bot model:', err);
-            });
+        // Load the drone model (GLB) directly
+        this.loadDroneModel('assets/drone.glb');
     }
 
 
@@ -94,6 +84,57 @@ export class application{
         // this.setupLightingGUI();
     }
 
+    loadDroneModel(path){
+        const loader = new GLTFLoader();
+        loader.load(
+            path,
+            async (gltf) => {
+                const model = gltf.scene || gltf.scenes?.[0];
+                if (!model) {
+                    console.warn('GLTF contains no scene');
+                    return;
+                }
+                // Optional: scale/position tweak
+                model.scale.set(2, 2, 2);
+                model.position.set(0, 0, 0);
+
+                this.scene.add(model);
+                this.droneModel = model;
+
+                // Do not outline by default; leave selection empty
+                this.outlineManager.setSelectedObjects([]);
+                console.log('Drone model loaded:', path);
+
+                // Log all mesh names for debugging
+                console.log('=== All Mesh Names in Drone Model ===');
+                const meshNames = [];
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        meshNames.push(child.name);
+                    }
+                });
+                console.log(meshNames);
+                console.log(`Total meshes: ${meshNames.length}`);
+
+                // Load assembly config and setup step buttons
+                try {
+                    const response = await fetch('jsons/ConfigJson/AssemblyManager.json');
+                    if (response.ok) {
+                        this.assemblyConfig = await response.json();
+                        this.outlineManager.setupStepButtons(model, this.assemblyConfig);
+                        console.log('Assembly config loaded and step buttons created');
+                    }
+                } catch (err) {
+                    console.warn('Failed to load assembly config:', err);
+                }
+            },
+            undefined,
+            (err) => {
+                console.error('Failed to load drone model:', path, err);
+            }
+        );
+    }
+
 
     construct_camera(){
         const fov = 45;
@@ -104,10 +145,23 @@ export class application{
         this.Cam.position.set(0, 6.5 ,2);
         this.Cam.lookAt(0, 0, 0);
 
-        // correcting camera lightning
+        
 
         this.Cam_Controls = new OrbitControls(this.Cam, this.canvas);
-        this.Cam_Controls.enableDamping = true; 
+        this.Cam_Controls.enableDamping = true;
+        // Lock translation: no panning, orbit around target only
+        this.Cam_Controls.enablePan = false;
+        this.Cam_Controls.enableRotate = true;
+        this.Cam_Controls.enableZoom = true;
+        // Always look at origin
+        this.Cam_Controls.target.set(0, 0, 0);
+        // Optional: constrain zoom distance
+        this.Cam_Controls.minDistance = 0.5;
+        this.Cam_Controls.maxDistance = 200;
+        // Optional: keep camera above horizon if desired
+        // this.Cam_Controls.minPolarAngle = 0.01;
+        // this.Cam_Controls.maxPolarAngle = Math.PI - 0.01;
+        this.Cam_Controls.update();
 
     }
 
@@ -129,7 +183,7 @@ export class application{
 
     AddLight_To_scene(){
         // Ambient light for general illumination
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 2); // Subtle ambient light
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 3); // Subtle ambient light
         this.scene.add(this.ambientLight);
 
         // Main directional light (sun-like)
@@ -152,7 +206,6 @@ export class application{
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
         this.scene.add(hemiLight);
 
-        // corrected ligtning
     }
 
     setupLightingGUI() {
@@ -189,26 +242,16 @@ export class application{
 
 
     update(deltaTime){
+        let lastTime = 0;
         // In WebXR, we use setAnimationLoop instead of requestAnimationFrame
-        this.renderer.setAnimationLoop(() => {
-            // Update animated model
-            if (this.animated_manager) {
-                this.animated_manager.update(deltaTime);
-                
-                // Update selected objects for outline
-                if (this.animated_manager.current_model) {
-                    // Use OutlineManager to selectively outline meshes
-                    // To outline all meshes:
-                    this.outlineManager.setSelectiveMeshes(this.animated_manager.current_model);
-                    
-                    // To outline only specific meshes (example - uncomment and modify as needed):
-                    // this.outlineManager.setSelectiveMeshes(
-                    //     this.animated_manager.current_model,
-                    //     (mesh) => mesh.name.includes('propeller') || mesh.name.includes('body')
-                    // );
-                }
-            }
-            
+        this.renderer.setAnimationLoop((time) => {
+            // Calculate delta time in seconds
+            const dt = lastTime ? (time - lastTime) / 1000 : 0;
+            lastTime = time;
+
+            // Update outline blinking
+            this.outlineManager.update(dt);
+
             // Handle XR rendering
             if (this.renderer.xr.isPresenting) {
                 this.renderer.render(this.scene, this.Cam);
@@ -224,28 +267,5 @@ export class application{
         });
     }
     
-    setupAnimationButtons() {
-        if (this.gui && this.animated_manager && this.animated_manager.animations.size > 0) {
-            const animFolder = this.gui.addFolder('Bot Animations');
-            const animations = {
-                playIdle: () => this.animated_manager.playAnimation('Idel_Animation', true),
-                playWalk: () => this.animated_manager.playAnimation('Walkcycle_Animation', true),
-                playDefault: () => this.animated_manager.playAnimation('Default Take', true),
-                stop: () => this.animated_manager.stopAnimations()
-            };
-
-            if (this.animated_manager.animations.has('Idel_Animation')) {
-                animFolder.add(animations, 'playIdle').name('Play Idle');
-            }
-            if (this.animated_manager.animations.has('Walkcycle_Animation')) {
-                animFolder.add(animations, 'playWalk').name('Play Walk');
-            }
-            if (this.animated_manager.animations.has('Default Take')) {
-                animFolder.add(animations, 'playDefault').name('Play Default Take');
-            }
-            animFolder.add(animations, 'stop').name('Stop Animations');
-        }
-    }
-
 }
 

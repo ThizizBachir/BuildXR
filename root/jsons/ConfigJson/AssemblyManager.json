@@ -1,14 +1,70 @@
 {
-    "sequence": [
-        {
-            "step": 0,
-            "clip": "assembly_step_01",
-            "crossfade": 0.3
-        },
-        {
-            "step": 1,
-            "clip": "assembly_step_02",
-            "crossfade": 0.3
-        }
-    ]
+  "steps": [
+    {
+      "id": "step-01",
+      "label": "Attach Camera",
+      "involvedMeshes": ["camera", "plateu_0", "camera_nut_3", "camera_screw_3", "camera_nut_1", "camera_nut_2", "camera_nut_4", "camera_screw_1", "camera_screw_2", "camera_screw_4"],
+      "groups": [],
+      "outline": {
+        "color": "#00ffcc",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-02",
+      "label": "Wing Assembly",
+      "involvedMeshes": ["+Y_vise_mta3_guide_ja3ba_gris.002", "+Y_vise_mta3_guide_ja3ba_gris.003", "+Y_vise_mta3_guide_ja3ba_gris.004", "+Y_vise_mta3_guide_ja3ba_gris.005", "+Y_vise_mta3_guide_ja3ba_gris.006", "+Y_vise_mta3_guide_ja3ba_gris.007", "+Y_vise_mta3_guide_ja3ba_gris.008", "+Y_vise_mta3_guide_ja3ba_gris.009", "+Y+X_yellow_Han", "+Y-X_yellow_Hand", "+Y_Grey_Attacher_2", "+Y_Grey_Attacher_1", "+Y_Cylindric_attacher_vertical_4", "+Y_Cylindric_attacher_vertical_3", "+Y_Cylindric_attacher_vertical_2", "+Y_Cylindric_attacher_vertical_1", "+Y_Black_Hand", "+Y_+X_Black_Leg", "+Y_-X_Black_Leg"],
+      "groups": [],
+      "outline": {
+        "color": "#ff00cc",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-03",
+      "label": "Motor Assembly",
+      "involvedMeshes": ["+_Y_motor_screw_4", "+_Y_motor_nut_4", "+_Y_motor_screw_1", "+_Y_motor_nut_1", "+_Y_motor_screw_2", "+_Y_motor_nut_2", "+_Y_motor_screw_3", "+_Y_motor_nut_3", "+YRotor1-ecrou", "+YRotor1", "+Ymotor"],
+      "groups": [],
+      "outline": {
+        "color": "#19c1ff",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    }
+  ]
 }
