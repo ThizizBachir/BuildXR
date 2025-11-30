@@ -14,17 +14,9 @@ const app = new application();
 
 
 let prevTime = 0;
-
-
 // FPS cap
 const MAX_FPS = 60;
 const FRAME_DURATION = 1 / MAX_FPS; // ~0.0167s
-
-
-
-
-
-
 
 
 
@@ -45,7 +37,6 @@ function render(time) {
   prevTime = time;
 
   app.update(delta);
-  requestAnimationFrame(render);
 }
 
 requestAnimationFrame(render);

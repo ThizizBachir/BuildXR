@@ -1,14 +1,180 @@
 {
-    "sequence": [
-        {
-            "step": 0,
-            "clip": "assembly_step_01",
-            "crossfade": 0.3
-        },
-        {
-            "step": 1,
-            "clip": "assembly_step_02",
-            "crossfade": 0.3
-        }
-    ]
+  "steps": [
+    {
+      "id": "step-01",
+      "label": "Attach Camera",
+      "involvedMeshes": ["camera", "camera_nut_1", "camera_nut_2", "camera_nut_3", "camera_nut_4", "camera_screw_1", "camera_screw_2", "camera_screw_3", "camera_screw_4", "plateu_0"],
+      "groups": [],
+      "outline": {
+        "color": "#00ffcc",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-02",
+      "label": "Wing Assembly",
+      "involvedMeshes": ["+Y_+X_Black_Leg", "+Y_+X_yellow_Hand", "+Y_-X_Black_Leg", "+Y_-X_yellow_Hand", "+Y_Black_Hand", "+Y_Cylindric_attacher_vertical_2", "+Y_Cylindric_attacher_vertical_3", "+Y_Cylindric_attacher_vertical_4", "+Y_Grey_Attacher_1", "+Y_Grey_Attacher_2", "+Y_vise_mta3_guide_ja3ba_gris_2", "+Y_vise_mta3_guide_ja3ba_gris_3", "+Y_vise_mta3_guide_ja3ba_gris_5", "+Y_vise_mta3_guide_ja3ba_gris_6", "+Y_vise_mta3_guide_ja3ba_gris_9"],
+      "groups": [],
+      "outline": {
+        "color": "#ff00cc",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-03",
+      "label": "Motor Assembly",
+      "involvedMeshes": ["+Y_wing_group","+Y_motor", "+Y_motor_nut_1", "+Y_motor_nut_2", "+Y_motor_nut_3", "+Y_motor_nut_4", "+Y_motor_screw_1", "+Y_motor_screw_2", "+Y_motor_screw_3", "+Y_motor_screw_4", "+Y_Rotor", "+Y_Rotor-ecrou"],
+      "groups": [],
+      "outline": {
+        "color": "#19c1ff",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-04",
+      "label": "Circuit Assembly",
+      "involvedMeshes": ["Circuit_Lower", "Circuit_nut_1", "Circuit_nut_2", "Circuit_nut_3", "Circuit_nut_4", "Circuit_screw_1", "Circuit_screw_2", "Circuit_screw_3", "Circuit_screw_4", "circuit_support_1", "circuit_support_2", "circuit_support_3", "circuit_support_4", "Circuit_Upper", "plateu_1"],
+      "groups": [],
+      "outline": {
+        "color": "#ffcc00",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-05",
+      "label": "medium frame Assembly",
+      "involvedMeshes": ["-X_wing_motor_group","+X_wing_motor_group","+Y_wing_motor_group","-Y_wing_motor_group","circuit_group"],
+      "groups": [],
+      "outline": {
+        "color": "#b3ff00",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-06",
+      "label": "medium - bottom frame Assembly",
+      "involvedMeshes": ["medium_frame_group","bottom_camera_group","+X_vise_mta3_guide_ja3ba_gris_10", "+X_vise_mta3_guide_ja3ba_gris_11", "+X_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "+Y_vise_mta3_guide_ja3ba_gris", "+Y_vise_mta3_guide_ja3ba_gris_1", "+Y_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "-X_vise_mta3_guide_ja3ba_gris_10", "-X_vise_mta3_guide_ja3ba_gris_11", "-X_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "-Y_vise_mta3_guide_ja3ba_gris_10", "-Y_vise_mta3_guide_ja3ba_gris_11", "-Y_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "Blue_Box", "Grey_Box", "wires_1", "wires_2", "wires_3", "wires_4"],
+      "groups": [],
+      "outline": {
+        "color": "#ffffff",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-07",
+      "label": "Upper Part Assembly",
+      "involvedMeshes": ["+X_+Y_yellow_arc_stand", "+X_-Y_yellow_arc_stand", "+X_yellow_Arc_Guide", "+Y_+X_yellow_arc_stand", "+Y_-X_yellow_arc_stand", "+Y_yellow_Arc_Guide", "-X_+Y_yellow_arc_stand", "-X_-Y_yellow_arc_stand", "-X_yellow_Arc_Guide", "-Y_+X_yellow_arc_stand", "-Y_-X_yellow_arc_stand", "-Y_yellow_Arc_Guide", "plateu_2", "plateu_3"],
+      "groups": [],
+      "outline": {
+        "color": "#cc00ff",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-08",
+      "label": "full Assembly",
+      "involvedMeshes": ["full_drone_group"],
+      "groups": [],
+      "outline": {
+        "color": "#ae0001",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    }
+  ]
 }

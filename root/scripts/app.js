@@ -1,11 +1,10 @@
 import * as THREE from 'three';
-import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as GUI from 'lilGUI';
 import { VRButton } from 'three/webxr/VRButton.js';
-import { AssemblyManager } from './AssemblyManager.js';
-import { AnimatedModelManager } from './AnimatedModelManager.js';
 import { OutlineManager } from './OutlineManager.js';
+import { MeshGroupLoader } from './MeshGroupLoader.js';
 
 
 
@@ -19,14 +18,12 @@ export class application{
         
         // Initialize OutlineManager for post-processing effects
         this.outlineManager = new OutlineManager(this.scene, this.Cam, this.renderer, this.gui);
-        
-        this.construct_Loaders();
 
-        // Initialize AnimatedModelManager to load a GLB directly from assets
-        this.animated_manager = new AnimatedModelManager(THREE, this.scene, this.gui);
-        this.animated_manager.initialize('assets/drone.glb').catch(err => {
-            console.warn('AnimatedModelManager: Failed to load drone model:', err);
-        });
+        // Initialize MeshGroupLoader
+        this.meshGroupLoader = new MeshGroupLoader();
+
+        // Load the drone model (GLB) directly
+        this.loadDroneModel('assets/drone.glb');
     }
 
 
@@ -88,7 +85,67 @@ export class application{
         document.body.appendChild(VRButton.createButton(this.renderer));
         
         // Setup lighting GUI controls after renderer is created
-        this.setupLightingGUI();
+        // this.setupLightingGUI();
+    }
+
+    loadDroneModel(path){
+        const loader = new GLTFLoader();
+        loader.load(
+            path,
+            async (gltf) => {
+                const model = gltf.scene || gltf.scenes?.[0];
+                if (!model) {
+                    console.warn('GLTF contains no scene');
+                    return;
+                }
+                // Optional: scale/position tweak
+                model.scale.set(2, 2, 2);
+                model.position.set(0, 0, 0);
+
+                this.scene.add(model);
+                this.droneModel = model;
+
+                // Do not outline by default; leave selection empty
+                this.outlineManager.setSelectedObjects([]);
+                console.log('Drone model loaded:', path);
+
+                // Log all mesh names for debugging
+                console.log('=== All Mesh Names in Drone Model ===');
+                const meshNames = [];
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        meshNames.push(child.name);
+                    }
+                });
+                console.log(meshNames);
+                console.log(`Total meshes: ${meshNames.length}`);
+
+                // Load mesh groups config and build groups
+                try {
+                    await this.meshGroupLoader.initialize('jsons/ConfigJson/MeshGroups.json');
+                    this.meshGroupLoader.buildGroups(model);
+                    console.log('MeshGroupLoader: Groups built');
+                } catch (err) {
+                    console.warn('Failed to load mesh groups:', err);
+                }
+
+                // Load assembly config and setup step buttons
+                try {
+                    const response = await fetch('jsons/ConfigJson/AssemblyManager.json');
+                    if (response.ok) {
+                        this.assemblyConfig = await response.json();
+                        this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader);
+                        console.log('Assembly config loaded and step buttons created');
+                    }
+                } catch (err) {
+                    console.warn('Failed to load assembly config:', err);
+                }
+            },
+            undefined,
+            (err) => {
+                console.error('Failed to load drone model:', path, err);
+            }
+        );
     }
 
 
@@ -101,8 +158,23 @@ export class application{
         this.Cam.position.set(0, 6.5 ,2);
         this.Cam.lookAt(0, 0, 0);
 
+        
+
         this.Cam_Controls = new OrbitControls(this.Cam, this.canvas);
-        this.Cam_Controls.enableDamping = true; 
+        this.Cam_Controls.enableDamping = true;
+        // Lock translation: no panning, orbit around target only
+        this.Cam_Controls.enablePan = false;
+        this.Cam_Controls.enableRotate = true;
+        this.Cam_Controls.enableZoom = true;
+        // Always look at origin
+        this.Cam_Controls.target.set(0, 0, 0);
+        // Optional: constrain zoom distance
+        this.Cam_Controls.minDistance = 0.5;
+        this.Cam_Controls.maxDistance = 200;
+        // Optional: keep camera above horizon if desired
+        // this.Cam_Controls.minPolarAngle = 0.01;
+        // this.Cam_Controls.maxPolarAngle = Math.PI - 0.01;
+        this.Cam_Controls.update();
 
     }
 
@@ -118,55 +190,21 @@ export class application{
         }
     }
 
-
-
-
-    AddRenderingFolder(){
-        const renderingFolder = this.gui.addFolder('Rendering Data');
-        renderingFolder.add(this.renderingData, 'fps').name('FPS').listen();
-    }
-
-
-    AddCameraFolder(){
-        const cameraFolder = this.gui.addFolder('Camera Control');
-        cameraFolder.add(this.cameraData, 'enableZoom').name('enableZoom').listen();
-        cameraFolder.add(this.cameraData, 'enableScroll').name('enableScroll').listen();
-        cameraFolder.add(this.cameraData, 'Mode', ['Flying']).name('Mode').listen()
-            .onChange(val => {
-                if (val === 'Flying') {
-                this.cameraData.currentCamera = this.Flying_Camera;
-                this.Flying_Camera_Controls.enableZoom = true;
-                this.cameraData.enableZoom = true;
-                }
-                else if (val === 'Follower') {
-                // Following camera mode removed - now using WebXR
-                this.Flying_Camera_Controls.enableZoom = false;
-                this.cameraData.enableZoom = false;
-                }
-            });
-        cameraFolder.add(this, 'Reset').name('Reset');
-    }
-
-    async construct_Loaders(){
-        // Only AnimatedModelManager is used for model loading and animation
-    }
+    // deleted unecessary folders from GUI for clarity
+   
 
 
     AddLight_To_scene(){
         // Ambient light for general illumination
-        this.ambientLight = new THREE.AmbientLight(0x404040, 1); // Subtle ambient light
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 3); // Subtle ambient light
         this.scene.add(this.ambientLight);
 
         // Main directional light (sun-like)
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-        this.directionalLight.position.set(5, 5, 5);
-        this.directionalLight.castShadow = true;
-        this.directionalLight.shadow.mapSize.width = 2048;
-        this.directionalLight.shadow.mapSize.height = 2048;
-        this.directionalLight.shadow.camera.near = 0.5;
-        this.directionalLight.shadow.camera.far = 50;
-        this.directionalLight.shadow.bias = -0.0001;
+        this.directionalLight = new THREE.DirectionalLight(0xffffff,3);
+        this.directionalLight.position.set(-6.3, 9.1, -10);
         this.scene.add(this.directionalLight);
+        const helper = new THREE.DirectionalLightHelper( this.directionalLight, 5 );
+        this.scene.add( helper );
 
         // Add some fill lights for better material definition
         const fillLight1 = new THREE.PointLight(0x9ca3af, 2);
@@ -180,6 +218,7 @@ export class application{
         // Add subtle hemisphere light for ambient occlusion-like effect
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
         this.scene.add(hemiLight);
+
     }
 
     setupLightingGUI() {
@@ -199,28 +238,6 @@ export class application{
 
 
 
-    Initialise_Data(){
-        this.renderingData= {
-            prevTime : 0,
-
-
-            // FPS cap
-            MAX_FPS : 60,
-            FRAME_DURATION : 1 / 60, // ~0.0167s
-
-            fps: 0,
-
-            frameCount :0,
-            fpsAccumulator :0,
-
-        }
-        this.cameraData ={
-            currentCamera : this.Flying_Camera,
-            enableZoom : true,
-            Mode : "Flying"// Flying, Follower
-
-        }
-    }
 
 
     updateFPS(delta) {
@@ -235,34 +252,19 @@ export class application{
     }
 
 
-    updateCamera(deltaTime){
-        this.Flying_Camera_Controls.enableZoom = this.cameraData.enableZoom;
-
-    }
-
 
 
     update(deltaTime){
+        let lastTime = 0;
         // In WebXR, we use setAnimationLoop instead of requestAnimationFrame
-        this.renderer.setAnimationLoop(() => {
-            // Update animated model
-            if (this.animated_manager) {
-                this.animated_manager.update(deltaTime);
-                
-                // Update selected objects for outline
-                if (this.animated_manager.current_model) {
-                    // Use OutlineManager to selectively outline meshes
-                    // To outline all meshes:
-                    this.outlineManager.setSelectiveMeshes(this.animated_manager.current_model);
-                    
-                    // To outline only specific meshes (example - uncomment and modify as needed):
-                    // this.outlineManager.setSelectiveMeshes(
-                    //     this.animated_manager.current_model,
-                    //     (mesh) => mesh.name.includes('propeller') || mesh.name.includes('body')
-                    // );
-                }
-            }
-            
+        this.renderer.setAnimationLoop((time) => {
+            // Calculate delta time in seconds
+            const dt = lastTime ? (time - lastTime) / 1000 : 0;
+            lastTime = time;
+
+            // Update outline blinking
+            this.outlineManager.update(dt);
+
             // Handle XR rendering
             if (this.renderer.xr.isPresenting) {
                 this.renderer.render(this.scene, this.Cam);
@@ -279,4 +281,4 @@ export class application{
     }
     
 }
-    
+

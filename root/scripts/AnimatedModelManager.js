@@ -16,7 +16,7 @@ export class AnimatedModelManager {
      * Initialize with a GLTF/GLB model containing animations
      * @param {string} modelPath - Path to the GLB/GLTF file
      */
-    async initialize(modelPath = 'assets/drone.glb') {
+    async initialize(modelPath = 'assets/New Folder/drone.glb') {
         console.log('AnimatedModelManager: Loading model from:', modelPath);
         try {
             const response = await fetch(modelPath);
