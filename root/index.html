@@ -17,7 +17,8 @@
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js",
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/",
-        "lilGUI" : "https://cdn.jsdelivr.net/npm/lil-gui@0.20/+esm"
+        "lilGUI" : "https://cdn.jsdelivr.net/npm/lil-gui@0.20/+esm",
+        "three/webxr/": "https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/webxr/"
       } 
     }
     </script>
@@ -28,9 +29,20 @@
   };
 </script>
 <script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
-<script type="module" src="scripts/app.js" defer="defer"></script>
+
+    <!-- load opencv and camera helpers before main app -->
+    <script type="module" src="./scripts/opencv/opencv-loader.js" defer></script>
+    <script type="module" src="./scripts/camera/CameraCapture.js" defer></script>
+    <script type="module" src="./scripts/ARManager.js" defer></script>
+
+<script type="module" src="./scripts/main.js" defer="defer"></script>
   </head>
   <body>
-    <div><h1>BuildXR</h1></div>
+    <!-- Camera and processing canvas used for AR background / CV processing.
+         The drone 3D object will remain managed by your XR scene (main.js). -->
+    <div id="camera-root" class="camera-root">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <canvas id="cameraCanvas"></canvas>
+    </div>
   </body>
 </html>

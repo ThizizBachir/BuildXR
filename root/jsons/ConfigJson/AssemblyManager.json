@@ -1,0 +1,14 @@
+{
+    "sequence": [
+        {
+            "step": 0,
+            "clip": "assembly_step_01",
+            "crossfade": 0.3
+        },
+        {
+            "step": 1,
+            "clip": "assembly_step_02",
+            "crossfade": 0.3
+        }
+    ]
+}
