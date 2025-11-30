@@ -280,26 +280,44 @@ export class OutlineManager {
 
                     // Expand base names to numbered variants or use group loader
                     let meshes = [];
+                    const debugCounts = [];
                     if (meshGroupLoader) {
                         // Try to resolve logical names via group loader first
                         step.involvedMeshes.forEach(name => {
+                            // Check baseName groups
                             const groupMeshes = meshGroupLoader.getMeshes(name);
                             if (groupMeshes) {
                                 meshes.push(...groupMeshes);
+                                debugCounts.push({ name, type: 'base-group', count: groupMeshes.length });
                             } else {
-                                // Fallback: expand base name directly
-                                meshes.push(...this._expandBaseNames(droneModel, [name]));
+                                // Check assembled groups
+                                const assembledMeshes = meshGroupLoader.getAssembledGroupMeshes(name);
+                                if (assembledMeshes) {
+                                    meshes.push(...assembledMeshes);
+                                    debugCounts.push({ name, type: 'assembled-group', count: assembledMeshes.length });
+                                } else {
+                                    // Fallback: expand base name directly
+                                    const direct = this._expandBaseNames(droneModel, [name]);
+                                    meshes.push(...direct);
+                                    debugCounts.push({ name, type: 'direct', count: direct.length });
+                                }
                             }
                         });
                     } else {
                         // No group loader: use direct expansion
                         meshes = this._expandBaseNames(droneModel, step.involvedMeshes);
+                        step.involvedMeshes.forEach(name => {
+                            const direct = this._expandBaseNames(droneModel, [name]);
+                            debugCounts.push({ name, type: 'direct', count: direct.length });
+                        });
                     }
 
                     if (meshes.length === 0) {
                         console.warn(`No meshes found for step ${stepId}. Check mesh names or prefixes.`);
+                        console.table(debugCounts);
                         return;
                     }
+                    console.table(debugCounts);
 
                     // Set outline color from config if available
                     if (step.outline && step.outline.color) {
