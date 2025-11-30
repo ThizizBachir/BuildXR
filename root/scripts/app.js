@@ -24,7 +24,7 @@ export class application{
 
         // Initialize AR environment tracking
         this.arTracker = new AREnvironmentTracker(THREE, this.scene);
-        await this.arTracker.initialize();
+        this.arTracker.initialize();
     }
 
 
