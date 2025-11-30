@@ -24,7 +24,6 @@ export class ContextualCardManager {
         this.lastUpdateTime = 0;
         this.updateInterval = 1 / this.config.updateFrequency;
 
-        // Setup GUI if available
         if (this.gui) {
             this.setupGUI();
         }
