@@ -259,8 +259,9 @@ export class OutlineManager {
      * Setup step outline buttons (8 buttons for step 1-8)
      * @param {Object3D} droneModel - The loaded drone model to search for meshes
      * @param {Object} assemblyConfig - The parsed AssemblyManager.json config
+     * @param {MeshGroupLoader} meshGroupLoader - Optional group loader for logical names
      */
-    setupStepButtons(droneModel, assemblyConfig) {
+    setupStepButtons(droneModel, assemblyConfig, meshGroupLoader = null) {
         if (!this.gui) return;
 
         const stepsFolder = this.gui.addFolder('Assembly Steps');
@@ -277,8 +278,23 @@ export class OutlineManager {
                         return;
                     }
 
-                    // Expand base names to numbered variants
-                    const meshes = this._expandBaseNames(droneModel, step.involvedMeshes);
+                    // Expand base names to numbered variants or use group loader
+                    let meshes = [];
+                    if (meshGroupLoader) {
+                        // Try to resolve logical names via group loader first
+                        step.involvedMeshes.forEach(name => {
+                            const groupMeshes = meshGroupLoader.getMeshes(name);
+                            if (groupMeshes) {
+                                meshes.push(...groupMeshes);
+                            } else {
+                                // Fallback: expand base name directly
+                                meshes.push(...this._expandBaseNames(droneModel, [name]));
+                            }
+                        });
+                    } else {
+                        // No group loader: use direct expansion
+                        meshes = this._expandBaseNames(droneModel, step.involvedMeshes);
+                    }
 
                     if (meshes.length === 0) {
                         console.warn(`No meshes found for step ${stepId}. Check mesh names or prefixes.`);

@@ -4,6 +4,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import * as GUI from 'lilGUI';
 import { VRButton } from 'three/webxr/VRButton.js';
 import { OutlineManager } from './OutlineManager.js';
+import { MeshGroupLoader } from './MeshGroupLoader.js';
 
 
 
@@ -17,6 +18,9 @@ export class application{
         
         // Initialize OutlineManager for post-processing effects
         this.outlineManager = new OutlineManager(this.scene, this.Cam, this.renderer, this.gui);
+
+        // Initialize MeshGroupLoader
+        this.meshGroupLoader = new MeshGroupLoader();
 
         // Load the drone model (GLB) directly
         this.loadDroneModel('assets/drone.glb');
@@ -116,12 +120,21 @@ export class application{
                 console.log(meshNames);
                 console.log(`Total meshes: ${meshNames.length}`);
 
+                // Load mesh groups config and build groups
+                try {
+                    await this.meshGroupLoader.initialize('jsons/ConfigJson/MeshGroups.json');
+                    this.meshGroupLoader.buildGroups(model);
+                    console.log('MeshGroupLoader: Groups built');
+                } catch (err) {
+                    console.warn('Failed to load mesh groups:', err);
+                }
+
                 // Load assembly config and setup step buttons
                 try {
                     const response = await fetch('jsons/ConfigJson/AssemblyManager.json');
                     if (response.ok) {
                         this.assemblyConfig = await response.json();
-                        this.outlineManager.setupStepButtons(model, this.assemblyConfig);
+                        this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader);
                         console.log('Assembly config loaded and step buttons created');
                     }
                 } catch (err) {
