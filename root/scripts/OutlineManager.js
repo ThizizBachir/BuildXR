@@ -282,31 +282,38 @@ export class OutlineManager {
                     let meshes = [];
                     const debugCounts = [];
                     if (meshGroupLoader) {
-                        // Try to resolve logical names via group loader first
-                        step.involvedMeshes.forEach(name => {
-                            // Check baseName groups
+                        const baseMeshes = step.involved?.baseMeshes || [];
+                        const assembledGroups = step.involved?.assembledGroups || [];
+                        
+                        // Process base meshes
+                        baseMeshes.forEach(name => {
                             const groupMeshes = meshGroupLoader.getMeshes(name);
                             if (groupMeshes) {
                                 meshes.push(...groupMeshes);
                                 debugCounts.push({ name, type: 'base-group', count: groupMeshes.length });
                             } else {
-                                // Check assembled groups
-                                const assembledMeshes = meshGroupLoader.getAssembledGroupMeshes(name);
-                                if (assembledMeshes) {
-                                    meshes.push(...assembledMeshes);
-                                    debugCounts.push({ name, type: 'assembled-group', count: assembledMeshes.length });
-                                } else {
-                                    // Fallback: expand base name directly
-                                    const direct = this._expandBaseNames(droneModel, [name]);
-                                    meshes.push(...direct);
-                                    debugCounts.push({ name, type: 'direct', count: direct.length });
-                                }
+                                const direct = this._expandBaseNames(droneModel, [name]);
+                                meshes.push(...direct);
+                                debugCounts.push({ name, type: 'direct', count: direct.length });
+                            }
+                        });
+                        
+                        // Process assembled groups
+                        assembledGroups.forEach(name => {
+                            const assembledMeshes = meshGroupLoader.getAssembledGroupMeshes(name);
+                            if (assembledMeshes) {
+                                meshes.push(...assembledMeshes);
+                                debugCounts.push({ name, type: 'assembled-group', count: assembledMeshes.length });
+                            } else {
+                                console.warn(`Assembled group "${name}" not found in loader`);
+                                debugCounts.push({ name, type: 'assembled-group', count: 0 });
                             }
                         });
                     } else {
-                        // No group loader: use direct expansion
-                        meshes = this._expandBaseNames(droneModel, step.involvedMeshes);
-                        step.involvedMeshes.forEach(name => {
+                        // No group loader: use direct expansion on baseMeshes only
+                        const baseMeshes = step.involved?.baseMeshes || [];
+                        meshes = this._expandBaseNames(droneModel, baseMeshes);
+                        baseMeshes.forEach(name => {
                             const direct = this._expandBaseNames(droneModel, [name]);
                             debugCounts.push({ name, type: 'direct', count: direct.length });
                         });

@@ -88,7 +88,50 @@
     "-X_-Y_Black_Leg",
     "-X_+Y_yellow_arc_stand",
     "-X_-Y_yellow_arc_stand",
-    "-Y_vise_mta3_guide_ja3ba_gris",
+    "-Y_vise_mta3_guide_ja3ba_gris_1",
+    "-Y_vise_mta3_guide_ja3ba_gris_2",
+    "-Y_vise_mta3_guide_ja3ba_gris_3",
+    "-Y_vise_mta3_guide_ja3ba_gris_4",
+    "-Y_vise_mta3_guide_ja3ba_gris_5",
+    "-Y_vise_mta3_guide_ja3ba_gris_6",
+    "-Y_vise_mta3_guide_ja3ba_gris_7",
+    "-Y_vise_mta3_guide_ja3ba_gris_8",
+    "-Y_vise_mta3_guide_ja3ba_gris_9",
+    "-Y_vise_mta3_guide_ja3ba_gris_10",
+    "-Y_vise_mta3_guide_ja3ba_gris_11",
+    "-X_vise_mta3_guide_ja3ba_gris_1",
+    "-X_vise_mta3_guide_ja3ba_gris_2",
+    "-X_vise_mta3_guide_ja3ba_gris_3",
+    "-X_vise_mta3_guide_ja3ba_gris_4",
+    "-X_vise_mta3_guide_ja3ba_gris_5",
+    "-X_vise_mta3_guide_ja3ba_gris_6",
+    "-X_vise_mta3_guide_ja3ba_gris_7",
+    "-X_vise_mta3_guide_ja3ba_gris_8",
+    "-X_vise_mta3_guide_ja3ba_gris_9",
+    "-X_vise_mta3_guide_ja3ba_gris_10",
+    "-X_vise_mta3_guide_ja3ba_gris_11",
+    "+Y_vise_mta3_guide_ja3ba_gris_1",
+    "+Y_vise_mta3_guide_ja3ba_gris_2",
+    "+Y_vise_mta3_guide_ja3ba_gris_3",
+    "+Y_vise_mta3_guide_ja3ba_gris_4",
+    "+Y_vise_mta3_guide_ja3ba_gris_5",
+    "+Y_vise_mta3_guide_ja3ba_gris_6",
+    "+Y_vise_mta3_guide_ja3ba_gris_7",
+    "+Y_vise_mta3_guide_ja3ba_gris_8",
+    "+Y_vise_mta3_guide_ja3ba_gris_9",
+    "+Y_vise_mta3_guide_ja3ba_gris_10",
+    "+Y_vise_mta3_guide_ja3ba_gris_11",
+    "+X_vise_mta3_guide_ja3ba_gris_1",
+    "+X_vise_mta3_guide_ja3ba_gris_2",
+    "+X_vise_mta3_guide_ja3ba_gris_3",
+    "+X_vise_mta3_guide_ja3ba_gris_4",
+    "+X_vise_mta3_guide_ja3ba_gris_5",
+    "+X_vise_mta3_guide_ja3ba_gris_6",
+    "+X_vise_mta3_guide_ja3ba_gris_7",
+    "+X_vise_mta3_guide_ja3ba_gris_8",
+    "+X_vise_mta3_guide_ja3ba_gris_9",
+    "+X_vise_mta3_guide_ja3ba_gris_10",
+    "+X_vise_mta3_guide_ja3ba_gris_11",
     "-Y_motor_screw_1",
     "-Y_motor_screw_4",
     "-Y_motor_screw_3",
@@ -100,7 +143,7 @@
     "-Y_Rotor",
     "-Y_Rotor-ecrou",
     "-Y_motor",
-    "-Y_-X_yellow_Han",
+    "-Y_-X_yellow_Hand",
     "-Y_+X_yellow_Hand",
     "-Y_yellow_Guide_2",
     "-Y_yellow_Arc_Guide",
@@ -156,40 +199,40 @@
   "assembledGroups": [
     {
       "name": "bottom_camera_group",
-      "baseNames": ["camera_nut_1", "camera_nut_2", "camera_nut_3", "camera_nut_4", "camera_screw_1", "camera_screw_2", "camera_screw_3", "camera_screw_4", "plateu_0"]
+      "groups": ["camera_nut_1", "camera_nut_2", "camera_nut_3", "camera_nut_4", "camera_screw_1", "camera_screw_2", "camera_screw_3", "camera_screw_4", "plateu_0","camera"]
     },
     {
       "name": "upper_group",
-      "baseNames": ["+X_+Y_yellow_arc_stand", "+X_-Y_yellow_arc_stand", "+X_yellow_Arc_Guide", "+Y_+X_yellow_arc_stand", "+Y_-X_yellow_arc_stand", "+Y_yellow_Arc_Guide", "-X_+Y_yellow_arc_stand", "-X_-Y_yellow_arc_stand", "-X_yellow_Arc_Guide", "-Y_+X_yellow_arc_stand", "-Y_-X_yellow_arc_stand", "-Y_yellow_Arc_Guide", "camera", "plateu_2", "plateu_3"]
+      "groups": ["+X_+Y_yellow_arc_stand", "+X_-Y_yellow_arc_stand", "+X_yellow_Arc_Guide", "+Y_+X_yellow_arc_stand", "+Y_-X_yellow_arc_stand", "+Y_yellow_Arc_Guide", "-X_+Y_yellow_arc_stand", "-X_-Y_yellow_arc_stand", "-X_yellow_Arc_Guide", "-Y_+X_yellow_arc_stand", "-Y_-X_yellow_arc_stand", "-Y_yellow_Arc_Guide", "camera", "plateu_2", "plateu_3"]
     },
     {
       "name": "+Y_wing_group",
-      "baseNames": ["+Y_+X_Black_Leg","+Y_-X_Black_Leg", "+Y_+X_yellow_Hand", "+Y_-X_yellow_Hand", "+Y_Black_Hand", "+Y_Cylindric_attacher_vertical_1", "+Y_Cylindric_attacher_vertical_2", "+Y_Cylindric_attacher_vertical_3", "+Y_Cylindric_attacher_vertical_4", "+Y_Grey_Attacher_1", "+Y_Grey_Attacher_2", "+Y_vise_mta3_guide_ja3ba_gris_2", "+Y_vise_mta3_guide_ja3ba_gris_3", "+Y_vise_mta3_guide_ja3ba_gris_6", "+Y_vise_mta3_guide_ja3ba_gris_7", "+Y_vise_mta3_guide_ja3ba_gris_8", "+Y_vise_mta3_guide_ja3ba_gris_9", "+Y_yellow_Guide_2"]
+      "groups": ["+Y_+X_Black_Leg","+Y_-X_Black_Leg", "+Y_+X_yellow_Hand", "+Y_-X_yellow_Hand", "+Y_Black_Hand", "+Y_Cylindric_attacher_vertical_1", "+Y_Cylindric_attacher_vertical_2", "+Y_Cylindric_attacher_vertical_3", "+Y_Cylindric_attacher_vertical_4", "+Y_Grey_Attacher_1", "+Y_Grey_Attacher_2", "+Y_vise_mta3_guide_ja3ba_gris_2", "+Y_vise_mta3_guide_ja3ba_gris_3", "+Y_vise_mta3_guide_ja3ba_gris_6", "+Y_vise_mta3_guide_ja3ba_gris_7", "+Y_vise_mta3_guide_ja3ba_gris_8", "+Y_vise_mta3_guide_ja3ba_gris_9", "+Y_yellow_Guide_2"]
     },
     {
       "name": "-Y_wing_group",
-      "baseNames": ["-Y_+X_Black_Leg","-Y_-X_Black_Leg", "-Y_+X_yellow_Hand", "-Y_-X_yellow_Hand", "-Y_Black_Hand", "-Y_Cylindric_attacher_vertical_1", "-Y_Cylindric_attacher_vertical_2", "-Y_Cylindric_attacher_vertical_3", "-Y_Cylindric_attacher_vertical_4", "-Y_Grey_Attacher_1", "-Y_Grey_Attacher_2", "-Y_vise_mta3_guide_ja3ba_gris_2", "-Y_vise_mta3_guide_ja3ba_gris_3", "-Y_vise_mta3_guide_ja3ba_gris_6", "-Y_vise_mta3_guide_ja3ba_gris_7", "-Y_vise_mta3_guide_ja3ba_gris_8", "-Y_vise_mta3_guide_ja3ba_gris_9", "-Y_yellow_Guide_2"]
+      "groups": ["-Y_+X_Black_Leg","-Y_-X_Black_Leg", "-Y_+X_yellow_Hand", "-Y_-X_yellow_Hand", "-Y_Black_Hand", "-Y_Cylindric_attacher_vertical_1", "-Y_Cylindric_attacher_vertical_2", "-Y_Cylindric_attacher_vertical_3", "-Y_Cylindric_attacher_vertical_4", "-Y_Grey_Attacher_1", "-Y_Grey_Attacher_2", "-Y_vise_mta3_guide_ja3ba_gris_2", "-Y_vise_mta3_guide_ja3ba_gris_3", "-Y_vise_mta3_guide_ja3ba_gris_6", "-Y_vise_mta3_guide_ja3ba_gris_7", "-Y_vise_mta3_guide_ja3ba_gris_8", "-Y_vise_mta3_guide_ja3ba_gris_9", "-Y_yellow_Guide_2"]
     },
     {"name": "+X_wing_group",
-     "baseNames": ["+X_+Y_Black_Leg","+X_-Y_Black_Leg", "+X_+Y_yellow_Hand", "+X_-Y_yellow_Hand", "+X_Black_Hand", "+X_Cylindric_attacher_vertical_1", "+X_Cylindric_attacher_vertical_2", "+X_Cylindric_attacher_vertical_3", "+X_Cylindric_attacher_vertical_4", "+X_Grey_Attacher_1", "+X_Grey_Attacher_2", "+X_vise_mta3_guide_ja3ba_gris_2", "+X_vise_mta3_guide_ja3ba_gris_3", "+X_vise_mta3_guide_ja3ba_gris_6", "+X_vise_mta3_guide_ja3ba_gris_7", "+X_vise_mta3_guide_ja3ba_gris_8", "+X_vise_mta3_guide_ja3ba_gris_9", "+X_yellow_Guide_2"]
+     "groups": ["+X_+Y_Black_Leg","+X_-Y_Black_Leg", "+X_+Y_yellow_Hand", "+X_-Y_yellow_Hand", "+X_Black_Hand", "+X_Cylindric_attacher_vertical_1", "+X_Cylindric_attacher_vertical_2", "+X_Cylindric_attacher_vertical_3", "+X_Cylindric_attacher_vertical_4", "+X_Grey_Attacher_1", "+X_Grey_Attacher_2", "+X_vise_mta3_guide_ja3ba_gris_2", "+X_vise_mta3_guide_ja3ba_gris_3", "+X_vise_mta3_guide_ja3ba_gris_6", "+X_vise_mta3_guide_ja3ba_gris_7", "+X_vise_mta3_guide_ja3ba_gris_8", "+X_vise_mta3_guide_ja3ba_gris_9", "+X_yellow_Guide_2"]
     },
     {"name": "-X_wing_group",
-     "baseNames": ["-X_+Y_Black_Leg","-X_-Y_Black_Leg", "-X_+Y_yellow_Hand", "-X_-Y_yellow_Hand", "-X_Black_Hand", "-X_Cylindric_attacher_vertical_1", "-X_Cylindric_attacher_vertical_2", "-X_Cylindric_attacher_vertical_3", "-X_Cylindric_attacher_vertical_4", "-X_Grey_Attacher_1", "-X_Grey_Attacher_2", "-X_vise_mta3_guide_ja3ba_gris_2", "-X_vise_mta3_guide_ja3ba_gris_3", "-X_vise_mta3_guide_ja3ba_gris_6", "-X_vise_mta3_guide_ja3ba_gris_7", "-X_vise_mta3_guide_ja3ba_gris_8", "-X_vise_mta3_guide_ja3ba_gris_9", "-X_yellow_Guide_2"]
+     "groups": ["-X_+Y_Black_Leg","-X_-Y_Black_Leg", "-X_+Y_yellow_Hand", "-X_-Y_yellow_Hand", "-X_Black_Hand", "-X_Cylindric_attacher_vertical_1", "-X_Cylindric_attacher_vertical_2", "-X_Cylindric_attacher_vertical_3", "-X_Cylindric_attacher_vertical_4", "-X_Grey_Attacher_1", "-X_Grey_Attacher_2", "-X_vise_mta3_guide_ja3ba_gris_2", "-X_vise_mta3_guide_ja3ba_gris_3", "-X_vise_mta3_guide_ja3ba_gris_6", "-X_vise_mta3_guide_ja3ba_gris_7", "-X_vise_mta3_guide_ja3ba_gris_8", "-X_vise_mta3_guide_ja3ba_gris_9", "-X_yellow_Guide_2"]
     },
     {"name": "circuit_group",
-     "baseNames":["Circuit_Lower", "Circuit_nut_1", "Circuit_nut_2", "Circuit_nut_3", "Circuit_nut_4", "Circuit_screw_1", "Circuit_screw_2", "Circuit_screw_3", "Circuit_screw_4", "circuit_support_1", "circuit_support_2", "circuit_support_3", "circuit_support_4", "Circuit_Upper", "plateu_1"]
+     "groups":["Circuit_Lower", "Circuit_nut_1", "Circuit_nut_2", "Circuit_nut_3", "Circuit_nut_4", "Circuit_screw_1", "Circuit_screw_2", "Circuit_screw_3", "Circuit_screw_4", "circuit_support_1", "circuit_support_2", "circuit_support_3", "circuit_support_4", "Circuit_Upper", "plateu_1"]
     },
     {"name": "+Y_motor_group",
-     "baseNames":["+Y_motor", "+Y_motor_nut_1", "+Y_motor_nut_2", "+Y_motor_nut_3", "+Y_motor_nut_4", "+Y_motor_screw_1", "+Y_motor_screw_2", "+Y_motor_screw_3", "+Y_motor_screw_4", "+Y_Rotor", "+Y_Rotor-ecrou"]
+     "groups":["+Y_motor", "+Y_motor_nut_1", "+Y_motor_nut_2", "+Y_motor_nut_3", "+Y_motor_nut_4", "+Y_motor_screw_1", "+Y_motor_screw_2", "+Y_motor_screw_3", "+Y_motor_screw_4", "+Y_Rotor", "+Y_Rotor-ecrou"]
     },
     {"name": "-Y_motor_group",
-     "baseNames":["-Y_motor", "-Y_motor_nut_1", "-Y_motor_nut_2", "-Y_motor_nut_3", "-Y_motor_nut_4", "-Y_motor_screw_1", "-Y_motor_screw_2", "-Y_motor_screw_3", "-Y_motor_screw_4", "-Y_Rotor", "-Y_Rotor-ecrou"]
+     "groups":["-Y_motor", "-Y_motor_nut_1", "-Y_motor_nut_2", "-Y_motor_nut_3", "-Y_motor_nut_4", "-Y_motor_screw_1", "-Y_motor_screw_2", "-Y_motor_screw_3", "-Y_motor_screw_4", "-Y_Rotor", "-Y_Rotor-ecrou"]
     },
     {"name": "+X_motor_group",
-     "baseNames":["+X_motor", "+X_motor_nut_1", "+X_motor_nut_2", "+X_motor_nut_3", "+X_motor_nut_4", "+X_motor_screw_1", "+X_motor_screw_2", "+X_motor_screw_3", "+X_motor_screw_4", "+X_Rotor", "+X_Rotor-ecrou"]
+     "groups":["+X_motor", "+X_motor_nut_1", "+X_motor_nut_2", "+X_motor_nut_3", "+X_motor_nut_4", "+X_motor_screw_1", "+X_motor_screw_2", "+X_motor_screw_3", "+X_motor_screw_4", "+X_Rotor", "+X_Rotor-ecrou"]
     },
     {"name": "-X_motor_group",
-     "baseNames":["-X_motor", "-X_motor_nut_1", "-X_motor_nut_2", "-X_motor_nut_3", "-X_motor_nut_4", "-X_motor_screw_1", "-X_motor_screw_2", "-X_motor_screw_3", "-X_motor_screw_4", "-X_Rotor", "-X_Rotor-ecrou"]
+     "groups":["-X_motor", "-X_motor_nut_1", "-X_motor_nut_2", "-X_motor_nut_3", "-X_motor_nut_4", "-X_motor_screw_1", "-X_motor_screw_2", "-X_motor_screw_3", "-X_motor_screw_4", "-X_Rotor", "-X_Rotor-ecrou"]
     },
     {
       "name": "+X_wing_motor_group",
@@ -217,7 +260,7 @@
     },
     {
       "name": "full_drone_group",
-      "baseNames": ["+X_motor_screw_4", "+X_motor_screw_3", "+X_motor_screw_2", "+X_motor_screw_1", "+X_motor_nut_4", "+X_motor_nut_3", "+X_motor_nut_2", "+X_motor_nut_1", "+X_vise_mta3_guide_ja3ba_gris", "+X_vise_mta3_guide_ja3ba_gris_1", "+X_vise_mta3_guide_ja3ba_gris_2", "+X_vise_mta3_guide_ja3ba_gris_3", "+X_vise_mta3_guide_ja3ba_gris_4", "+X_vise_mta3_guide_ja3ba_gris_5", "+X_vise_mta3_guide_ja3ba_gris_6", "+X_vise_mta3_guide_ja3ba_gris_7", "+X_vise_mta3_guide_ja3ba_gris_8", "+X_vise_mta3_guide_ja3ba_gris_9", "+X_vise_mta3_guide_ja3ba_gris_10", "+X_vise_mta3_guide_ja3ba_gris_11", "+X_+Y_yellow_arc_stand", "+X_-Y_yellow_arc_stand", "+X_+Y_Black_Leg", "+X_-Y_Black_Leg", "+X_Black_Hand", "+X_Cylindric_attacher_vertical_1", "+X_Cylindric_attacher_vertical_2", "+X_Cylindric_attacher_vertical_3", "+X_Cylindric_attacher_vertical_4", "+X_Cylindric_attacher_vertical_5", "+X_Motor_Rotor_nut", "+X_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "+X_Grey_Attacher_1", "+X_Grey_Attacher_2", "+X_Rotor_Screw", "+X_yellow_Arc_Guide", "+X_yellow_Guide_2", "+X_+Y_yellow_Hand", "+X_-Y_yellow_Hand", "+X_motor", "+X_Rotor", "+X_Rotor_nut", "+Y_vise_mta3_guide_ja3ba_gris", "+Y_vise_mta3_guide_ja3ba_gris_1", "+Y_vise_mta3_guide_ja3ba_gris_2", "+Y_vise_mta3_guide_ja3ba_gris_3", "+Y_vise_mta3_guide_ja3ba_gris_4", "+Y_vise_mta3_guide_ja3ba_gris_5", "+Y_vise_mta3_guide_ja3ba_gris_6", "+Y_vise_mta3_guide_ja3ba_gris_7", "+Y_vise_mta3_guide_ja3ba_gris_8", "+Y_vise_mta3_guide_ja3ba_gris_9", "+Y_vise_mta3_guide_ja3ba_gris_10", "+Y_vise_mta3_guide_ja3ba_gris_11", "+Y_motor_screw_4", "+Y_motor_nut_4", "+Y_motor_screw_1", "+Y_motor_nut_1", "+Y_motor_screw_2", "+Y_motor_nut_2", "+Y_motor_screw_3", "+Y_motor_nut_3", "+Y_Rotor-ecrou", "+Y_Rotor", "+Y_motor", "+Y_+X_yellow_Hand", "+Y_-X_yellow_Hand", "+Y_yellow_Guide_2", "+Y_yellow_Arc_Guide", "+Y_Rotor-vis", "+Y_Grey_Attacher_2", "+Y_Grey_Attacher_1", "+Y_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "+Y_ecrouda5laniya", "+Y_Cylindric_attacher_vertical_5", "+Y_Cylindric_attacher_vertical_4", "+Y_Cylindric_attacher_vertical_3", "+Y_Cylindric_attacher_vertical_2", "+Y_Cylindric_attacher_vertical_1", "+Y_Black_Hand", "+Y_+X_Black_Leg", "+Y_-X_Black_Leg", "+Y_+X_yellow_arc_stand", "+Y_-X_yellow_arc_stand", "-X_motor_screw_2", "-X_motor_screw_1", "-X_motor_screw_4", "-X_motor_screw_3", "-X_motor_nut_2", "-X_motor_nut_1", "-X_motor_nut_4", "-X_motor_nut_3", "-X_vise_mta3_guide_ja3ba_gris", "-X_vise_mta3_guide_ja3ba_gris_1", "-X_vise_mta3_guide_ja3ba_gris_2", "-X_vise_mta3_guide_ja3ba_gris_3", "-X_vise_mta3_guide_ja3ba_gris_4", "-X_vise_mta3_guide_ja3ba_gris_5", "-X_vise_mta3_guide_ja3ba_gris_6", "-X_vise_mta3_guide_ja3ba_gris_7", "-X_vise_mta3_guide_ja3ba_gris_8", "-X_vise_mta3_guide_ja3ba_gris_9", "-X_vise_mta3_guide_ja3ba_gris_10", "-X_vise_mta3_guide_ja3ba_gris_11", "-X_Rotor+ecrou", "-X_Rotor", "-X_motor", "-X_+Y_yellow_Hand", "-X_-Y_yellow_Hand", "-X_yellow_Guide_2", "-X_yellow_Arc_Guide", "-X_Rotor+vis", "-X_Grey_Attacher_2", "-X_Grey_Attacher_1", "-X_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "-X_ecrouda5laniya", "-X_Cylindric_attacher_vertical_5", "-X_Cylindric_attacher_vertical_4", "-X_Cylindric_attacher_vertical_3", "-X_Cylindric_attacher_vertical_2", "-X_Cylindric_attacher_vertical_1", "-X_Black_Hand", "-X_+Y_Black_Leg", "-X_-Y_Black_Leg", "-X_+Y_yellow_arc_stand", "-X_-Y_yellow_arc_stand", "-Y_vise_mta3_guide_ja3ba_gris", "-Y_vise_mta3_guide_ja3ba_gris_1", "-Y_vise_mta3_guide_ja3ba_gris_2", "-Y_vise_mta3_guide_ja3ba_gris_3", "-Y_vise_mta3_guide_ja3ba_gris_4", "-Y_vise_mta3_guide_ja3ba_gris_5", "-Y_vise_mta3_guide_ja3ba_gris_6", "-Y_vise_mta3_guide_ja3ba_gris_7", "-Y_vise_mta3_guide_ja3ba_gris_8", "-Y_vise_mta3_guide_ja3ba_gris_9", "-Y_vise_mta3_guide_ja3ba_gris_10", "-Y_vise_mta3_guide_ja3ba_gris_11", "-Y_motor_screw_1", "-Y_motor_screw_4", "-Y_motor_screw_3", "-Y_motor_screw_2", "-Y_motor_nut_1", "-Y_motor_nut_4", "-Y_motor_nut_3", "-Y_motor_nut_2", "-Y_Rotor", "-Y_Rotor-ecrou", "-Y_motor", "-Y_-X_yellow_Hand", "-Y_+X_yellow_Hand", "-Y_yellow_Guide_2", "-Y_yellow_Arc_Guide", "-Y_Rotor-vis", "-Y_Grey_Attacher_2", "-Y_Grey_Attacher_1", "-Y_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul", "-Y_ecrouda5laniya", "-Y_Cylindric_attacher_vertical_5", "-Y_Cylindric_attacher_vertical_4", "-Y_Cylindric_attacher_vertical_3", "-Y_Cylindric_attacher_vertical_2", "-Y_Cylindric_attacher_vertical_1", "-Y_Black_Hand", "-Y_-X_Black_Leg", "-Y_+X_Black_Leg", "-Y_-X_yellow_arc_stand", "-Y_+X_yellow_arc_stand", "Circuit_Lower", "wires_2", "wires_4", "wires_3", "wires_1", "camera", "Circuit_Upper", "plateu_3", "plateu_1", "plateu_0", "Blue_Box", "Grey_Box", "camera_nut_3", "camera_screw_3", "plateu_2", "circuit_support_2", "circuit_support_3", "circuit_support_4", "circuit_support_1", "Circuit_screw_1", "Circuit_nut_1", "Circuit_screw_2", "Circuit_nut_2", "Circuit_screw_3", "Circuit_nut_3", "Circuit_screw_4", "Circuit_nut_4", "camera_nut_1", "camera_nut_2", "camera_nut_4", "camera_screw_1", "camera_screw_2", "camera_screw_4"]
+      "groups": ["bottom+medium_frame_group", "upper_group"]
     }
 ]
   
