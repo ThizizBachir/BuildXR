@@ -7,6 +7,7 @@ export class VisibilityManager {
         this.allBaseMeshNames = [];
         this.allAssembledGroupNames = [];
         this.originalPositions = new Map();
+        this.originalMaterialProps = new Map();
     }
 
     initialize() {
@@ -18,6 +19,23 @@ export class VisibilityManager {
             if (meshes) {
                 meshes.forEach(mesh => {
                     this.originalPositions.set(mesh.uuid, mesh.position.clone());
+                    
+                    // Clone materials so each mesh has its own instance for independent opacity control
+                    if (mesh.material) {
+                        if (Array.isArray(mesh.material)) {
+                            mesh.material = mesh.material.map(mat => mat.clone());
+                        } else {
+                            mesh.material = mesh.material.clone();
+                        }
+                        
+                        // Store original material properties for fade restoration
+                        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                        const materialProps = materials.map(mat => ({
+                            transparent: mat.transparent,
+                            opacity: mat.opacity
+                        }));
+                        this.originalMaterialProps.set(mesh.uuid, materialProps);
+                    }
                 });
             }
         });
@@ -51,15 +69,8 @@ export class VisibilityManager {
 
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        const involvedSet = new Set(allInvolvedMeshes);
-        this.allBaseMeshNames.forEach(name => {
-            const meshes = this.meshGroupLoader.getMeshes(name);
-            if (meshes) {
-                meshes.forEach(mesh => {
-                    mesh.visible = involvedSet.has(mesh);
-                });
-            }
-        });
+        // Fade out non-involved meshes
+        await this._fadeOutNonInvolved(allInvolvedMeshes);
 
         // Wait 0.5 seconds after hiding meshes before starting translation
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -69,6 +80,66 @@ export class VisibilityManager {
         }
 
         console.log(`VisibilityManager: Centered and showing ${allInvolvedMeshes.length} meshes`);
+    }
+
+    async _fadeOutNonInvolved(involvedMeshes) {
+        const involvedSet = new Set(involvedMeshes);
+        const meshesToFade = [];
+        
+        // Collect all meshes that need to fade out
+        this.allBaseMeshNames.forEach(name => {
+            const meshes = this.meshGroupLoader.getMeshes(name);
+            if (meshes) {
+                meshes.forEach(mesh => {
+                    if (!involvedSet.has(mesh)) {
+                        meshesToFade.push(mesh);
+                        // Enable transparency for fade effect
+                        if (mesh.material) {
+                            const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                            materials.forEach(mat => {
+                                mat.transparent = true;
+                            });
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Animate fade out over 500ms
+        const duration = 500;
+        const startTime = Date.now();
+        
+        return new Promise(resolve => {
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Fade from 1 to 0
+                const opacity = 1 - progress;
+                
+                meshesToFade.forEach(mesh => {
+                    if (mesh.material) {
+                        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                        materials.forEach(mat => {
+                            mat.opacity = opacity;
+                        });
+                    }
+                });
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Hide meshes completely after fade
+                    meshesToFade.forEach(mesh => {
+                        mesh.visible = false;
+                    });
+                    console.log(`VisibilityManager: Faded out ${meshesToFade.length} meshes`);
+                    resolve();
+                }
+            };
+            
+            animate();
+        });
     }
 
     async _centerMeshesAtOrigin(meshes) {
@@ -139,11 +210,76 @@ export class VisibilityManager {
         });
     }
 
-    showAll() {
+    async showAll() {
+        const allMeshes = [];
+        const meshAnimations = [];
+        
+        // Collect all meshes, restore visibility, and prepare animations
         this.allBaseMeshNames.forEach(name => {
-            this.meshGroupLoader.setGroupVisibility(name, true);
+            const meshes = this.meshGroupLoader.getMeshes(name);
+            if (meshes) {
+                meshes.forEach(mesh => {
+                    mesh.visible = true;
+                    allMeshes.push(mesh);
+                    
+                    if (mesh.material) {
+                        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                        const originalProps = this.originalMaterialProps.get(mesh.uuid) || [];
+                        
+                        // Store starting opacity and target opacity for each material
+                        const matAnimations = materials.map((mat, idx) => {
+                            const original = originalProps[idx] || { transparent: false, opacity: 1 };
+                            return {
+                                material: mat,
+                                startOpacity: mat.opacity,
+                                targetOpacity: original.opacity,
+                                targetTransparent: original.transparent
+                            };
+                        });
+                        
+                        meshAnimations.push({ mesh, matAnimations });
+                        
+                        // Enable transparency for animation
+                        materials.forEach(mat => {
+                            mat.transparent = true;
+                        });
+                    }
+                });
+            }
         });
-        console.log('VisibilityManager: All meshes visible');
+        
+        // Fade in over 300ms
+        const duration = 300;
+        const startTime = Date.now();
+        
+        return new Promise(resolve => {
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                meshAnimations.forEach(({ matAnimations }) => {
+                    matAnimations.forEach(({ material, startOpacity, targetOpacity }) => {
+                        material.opacity = startOpacity + (targetOpacity - startOpacity) * progress;
+                    });
+                });
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Restore original material properties
+                    meshAnimations.forEach(({ matAnimations }) => {
+                        matAnimations.forEach(({ material, targetOpacity, targetTransparent }) => {
+                            material.opacity = targetOpacity;
+                            material.transparent = targetTransparent;
+                        });
+                    });
+                    console.log('VisibilityManager: All meshes visible');
+                    resolve();
+                }
+            };
+            
+            animate();
+        });
     }
 
     hideAll() {

@@ -274,7 +274,7 @@ export class OutlineManager {
                     // Reset everything before applying new step
                     if (visibilityManager) {
                         visibilityManager.resetPositions();
-                        visibilityManager.showAll();
+                        await visibilityManager.showAll();
                     }
 
                     // Expand base names to numbered variants or use group loader
