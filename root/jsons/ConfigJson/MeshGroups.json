@@ -194,7 +194,13 @@
     "camera_nut_4",
     "camera_screw_1",
     "camera_screw_2",
-    "camera_screw_4"
+    "camera_screw_4",
+    "-Y_vise_mta3_guide_ja3ba_gris",
+    "+X_Cylindric_attacher_vertical_2",
+    "+X_Cylindric_attacher_vertical_3",
+    "+X_Cylindric_attacher_vertical_4",
+    "+X_Cylindric_attacher_vertical_5", 
+    "+X_Grey_Attacher_2"
   ],
   "assembledGroups": [
     {

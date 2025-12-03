@@ -255,27 +255,26 @@ export class OutlineManager {
             .onChange(value => this.outlinePass.hiddenEdgeColor.set(value));
     }
 
-    /**
-     * Setup step outline buttons (8 buttons for step 1-8)
-     * @param {Object3D} droneModel - The loaded drone model to search for meshes
-     * @param {Object} assemblyConfig - The parsed AssemblyManager.json config
-     * @param {MeshGroupLoader} meshGroupLoader - Optional group loader for logical names
-     */
-    setupStepButtons(droneModel, assemblyConfig, meshGroupLoader = null) {
+    setupStepButtons(droneModel, assemblyConfig, meshGroupLoader = null, visibilityManager = null) {
         if (!this.gui) return;
 
         const stepsFolder = this.gui.addFolder('Assembly Steps');
         
-        // Create buttons for steps 1-8
         for (let i = 1; i <= 8; i++) {
             const stepId = `step-0${i}`;
             const step = assemblyConfig.steps.find(s => s.id === stepId);
             
             const controls = {
-                [`outlineStep${i}`]: () => {
+                [`outlineStep${i}`]: async () => {
                     if (!step) {
                         console.warn(`Step ${stepId} not found in config`);
                         return;
+                    }
+
+                    // Reset everything before applying new step
+                    if (visibilityManager) {
+                        visibilityManager.resetPositions();
+                        visibilityManager.showAll();
                     }
 
                     // Expand base names to numbered variants or use group loader
@@ -326,19 +325,20 @@ export class OutlineManager {
                     }
                     console.table(debugCounts);
 
-                    // Set outline color from config if available
                     if (step.outline && step.outline.color) {
                         this.outlinePass.visibleEdgeColor.set(step.outline.color);
                     }
 
-                    // Apply single-color outline to all selected meshes
                     this.applySingleColorOutline(meshes, step.outline?.color);
-                    // Enable blinking if requested
                     const blinkFreq = step.outline?.blinkFreq || 2.0;
                     const blinking = step.outline?.blinking !== false;
                     this.setBlinking(blinking, blinkFreq);
 
                     console.log(`OutlineManager: Step ${i} - outlined ${meshes.length} meshes`);
+
+                    if (visibilityManager) {
+                        await visibilityManager.showOnlyStepMeshes(step);
+                    }
                 }
             };
 
