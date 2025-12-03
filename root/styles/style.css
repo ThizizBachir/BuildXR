@@ -1,10 +1,238 @@
 body {
   margin: 0;
   overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 canvas {
   display: block;
-   width: 100%;
-   height: 80%;
+  width: 100%;
+  height: 100%;
+}
+
+/* Step Cards Container */
+.step-cards-container {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 350px;
+  height: 90vh;
+  max-height: 850px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 20px 20px 0;
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-cards-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 30px 20px 20px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+}
+
+.step-cards-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Center indicator arrow - full height */
+.step-cards-container::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  background: linear-gradient(to bottom, 
+    transparent 0%,
+    transparent 20%,
+    rgba(100, 150, 255, 0.15) 30%,
+    rgba(100, 150, 255, 0.25) 50%,
+    rgba(100, 150, 255, 0.15) 30%,
+    transparent 80%,
+    transparent 100%
+  );
+  z-index: 10;
+  pointer-events: none;
+  animation: pulseArrow 2s ease-in-out infinite;
+}
+
+.step-cards-container::after {
+  content: '◀';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  color: rgba(100, 150, 255, 0.9);
+  z-index: 11;
+  pointer-events: none;
+  animation: pulseArrowIcon 2s ease-in-out infinite;
+}
+
+@keyframes pulseArrow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes pulseArrowIcon {
+  0%, 100% {
+    opacity: 0.7;
+    transform: translateY(-50%) translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-5px);
+  }
+}
+
+/* Individual Step Card */
+.step-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 18px;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  opacity: 0.5;
+  transform: scale(0.9);
+  transform-origin: center;
+}
+
+.step-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Center card (focused) - ONLY this one is bigger */
+.step-card.center {
+  opacity: 1;
+  transform: scale(1.15);
+  background: rgba(100, 150, 255, 0.15);
+  border-color: rgba(100, 150, 255, 0.4);
+  box-shadow: 0 10px 30px rgba(100, 150, 255, 0.3);
+  z-index: 2;
+}
+
+.step-card.center::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, #6496ff, #4070ff);
+  box-shadow: 0 0 10px rgba(100, 150, 255, 0.5);
+}
+
+/* Adjacent cards (one step from center) - same size as others */
+.step-card.adjacent {
+  opacity: 0.5;
+  transform: scale(0.9);
+}
+
+/* Edge cards (fading out) - same size as others */
+.step-card.edge {
+  opacity: 0.5;
+  transform: scale(0.9);
+  pointer-events: none;
+}
+
+/* Step Card Header */
+.step-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.step-number {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 6px;
+  min-width: 35px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.step-card.center .step-number {
+  background: linear-gradient(135deg, #6496ff, #4070ff);
+  font-size: 15px;
+  padding: 6px 12px;
+}
+
+.step-label {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.step-card.center .step-label {
+  font-size: 17px;
+}
+
+/* Step Card Content */
+.step-card-content {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.step-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.step-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.step-meta-icon {
+  opacity: 0.7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .step-cards-container {
+    width: 280px;
+  }
+  
+  .step-card {
+    padding: 14px;
+  }
+  
+  .step-card.center {
+    transform: scale(1.05);
+  }
 }

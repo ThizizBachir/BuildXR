@@ -6,6 +6,7 @@ import { VRButton } from 'three/webxr/VRButton.js';
 import { OutlineManager } from './OutlineManager.js';
 import { MeshGroupLoader } from './MeshGroupLoader.js';
 import { VisibilityManager } from './VisibilityManager.js';
+import { StepCardsUI } from './StepCardsUI.js';
 
 
 
@@ -25,6 +26,9 @@ export class application{
         
         // Initialize VisibilityManager
         this.visibilityManager = null; // Will be initialized after groups are built
+        
+        // Initialize StepCardsUI
+        this.stepCardsUI = new StepCardsUI();
 
         // Load the drone model (GLB) directly
         this.loadDroneModel('assets/drone.glb');
@@ -143,6 +147,12 @@ export class application{
                     if (response.ok) {
                         this.assemblyConfig = await response.json();
                         this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader, this.visibilityManager);
+                        
+                        // Initialize step cards UI (visual only, not linked to functionality yet)
+                        this.stepCardsUI.initialize(this.assemblyConfig, (step) => {
+                            console.log('Step card clicked:', step.id, '- functionality not linked yet');
+                        });
+                        
                         console.log('Assembly config loaded and step buttons created');
                     }
                 } catch (err) {
