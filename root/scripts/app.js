@@ -148,10 +148,23 @@ export class application{
                         this.assemblyConfig = await response.json();
                         this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader, this.visibilityManager);
                         
-                        // Initialize step cards UI (visual only, not linked to functionality yet)
-                        this.stepCardsUI.initialize(this.assemblyConfig, (step) => {
-                            console.log('Step card clicked:', step.id, '- functionality not linked yet');
-                        });
+                        // Initialize step cards UI with two callbacks
+                        this.stepCardsUI.initialize(
+                            this.assemblyConfig,
+                            // onStepSelect (when card comes into focus by scrolling)
+                            (step) => {
+                                console.log('Step card focused:', step.id);
+                                // Apply outline only (no visibility or movement changes)
+                                // This will reset positions and visibility before applying new outline
+                                this.outlineManager.applyStepOutline(step, model, this.meshGroupLoader, true, this.visibilityManager);
+                            },
+                            // onStepClick (when card is clicked)
+                            (step) => {
+                                console.log('Step card clicked:', step.id);
+                                // Apply full animation (outline + fade + center)
+                                this.outlineManager.applyFullStepAnimation(step, model, this.meshGroupLoader, this.visibilityManager);
+                            }
+                        );
                         
                         console.log('Assembly config loaded and step buttons created');
                     }

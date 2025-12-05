@@ -82,6 +82,42 @@ export class VisibilityManager {
         console.log(`VisibilityManager: Centered and showing ${allInvolvedMeshes.length} meshes`);
     }
 
+    async showOnlyStepMeshesWithFade(step) {
+        const involvedBaseMeshes = step.involved?.baseMeshes || [];
+        const involvedAssembledGroups = step.involved?.assembledGroups || [];
+
+        const allInvolvedMeshes = [];
+
+        involvedBaseMeshes.forEach(name => {
+            const meshes = this.meshGroupLoader.getMeshes(name);
+            if (meshes) {
+                allInvolvedMeshes.push(...meshes);
+            }
+        });
+
+        involvedAssembledGroups.forEach(name => {
+            const meshes = this.meshGroupLoader.getAssembledGroupMeshes(name);
+            if (meshes) {
+                allInvolvedMeshes.push(...meshes);
+            }
+        });
+
+        console.log(`VisibilityManager: Processing ${allInvolvedMeshes.length} meshes for step ${step.id} with fade`);
+
+        // 1. Fade out non-involved meshes
+        await this._fadeOutNonInvolved(allInvolvedMeshes);
+
+        // 2. Translate involved meshes to center
+        if (allInvolvedMeshes.length > 0) {
+            await this._centerMeshesAtOrigin(allInvolvedMeshes);
+        }
+
+        // 3. Fade out involved meshes while keeping outline
+        await this._fadeOutInvolved(allInvolvedMeshes);
+
+        console.log(`VisibilityManager: Completed fade sequence for ${allInvolvedMeshes.length} meshes`);
+    }
+
     async _fadeOutNonInvolved(involvedMeshes) {
         const involvedSet = new Set(involvedMeshes);
         const meshesToFade = [];
@@ -134,6 +170,63 @@ export class VisibilityManager {
                         mesh.visible = false;
                     });
                     console.log(`VisibilityManager: Faded out ${meshesToFade.length} meshes`);
+                    resolve();
+                }
+            };
+            
+            animate();
+        });
+    }
+
+    async _fadeOutInvolved(involvedMeshes) {
+        const meshesToFade = involvedMeshes;
+        
+        // Enable transparency for fade effect
+        meshesToFade.forEach(mesh => {
+            if (mesh.material) {
+                const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                materials.forEach(mat => {
+                    mat.transparent = true;
+                });
+            }
+        });
+        
+        // Animate fade out over 500ms
+        const duration = 500;
+        const startTime = Date.now();
+        
+        return new Promise(resolve => {
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Fade from 1 to 0
+                const opacity = 1 - progress;
+                
+                meshesToFade.forEach(mesh => {
+                    if (mesh.material) {
+                        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                        materials.forEach(mat => {
+                            mat.opacity = opacity;
+                        });
+                    }
+                });
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Set opacity to 0 but keep meshes visible for outline to work
+                    meshesToFade.forEach(mesh => {
+                        if (mesh.material) {
+                            const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                            materials.forEach(mat => {
+                                mat.opacity = 0;
+                            });
+                        }
+                        // Keep visible=true so OutlinePass can still detect and outline the mesh
+                        mesh.visible = true;
+                    });
+                    console.log(`VisibilityManager: Faded out ${meshesToFade.length} involved meshes (kept visible for outline)`);
                     resolve();
                 }
             };

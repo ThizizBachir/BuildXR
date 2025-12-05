@@ -3,6 +3,7 @@ export class StepCardsUI {
         this.container = document.querySelector('.step-cards-scroll');
         this.activeStepId = null;
         this.onStepSelect = null;
+        this.onStepClick = null;
         this.cards = [];
         this.centerIndex = 0;
         this.isScrolling = false;
@@ -11,8 +12,9 @@ export class StepCardsUI {
         this.scrollDirection = 0;
     }
 
-    initialize(assemblyConfig, onStepSelectCallback) {
+    initialize(assemblyConfig, onStepSelectCallback, onStepClickCallback) {
         this.onStepSelect = onStepSelectCallback;
+        this.onStepClick = onStepClickCallback;
         this.generateCards(assemblyConfig.steps);
         this.setupScrollListener();
         this.setupWheelListener();
@@ -87,8 +89,9 @@ export class StepCardsUI {
             const cardIndex = this.cards.findIndex(c => c.element === card);
             if (cardIndex !== -1) {
                 this.scrollToCard(cardIndex, true);
-                if (this.onStepSelect) {
-                    this.onStepSelect(step);
+                // Trigger full step animation (outline + fade + center)
+                if (this.onStepClick) {
+                    this.onStepClick(step);
                 }
             }
         });
@@ -152,6 +155,9 @@ export class StepCardsUI {
             }
         });
 
+        // Check if center card changed
+        const centerChanged = this.centerIndex !== closestCard;
+        
         // Update center index
         this.centerIndex = closestCard;
 
@@ -171,6 +177,11 @@ export class StepCardsUI {
                 cardData.element.classList.add('edge');
             }
         });
+
+        // Trigger callback when center card changes
+        if (centerChanged && this.onStepSelect && this.cards[closestCard]) {
+            this.onStepSelect(this.cards[closestCard].step);
+        }
     }
 
     snapToNearestCard() {

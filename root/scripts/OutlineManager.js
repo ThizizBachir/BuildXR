@@ -381,4 +381,148 @@ export class OutlineManager {
             }
         }
     }
+
+    /**
+     * Apply outline for a step (outline only, no visibility or movement changes)
+     * @param {Object} step - The step configuration
+     * @param {THREE.Object3D} droneModel - The drone model
+     * @param {MeshGroupLoader} meshGroupLoader - The mesh group loader
+     * @param {boolean} enableBlinking - Whether to enable blinking (default true)
+     * @param {VisibilityManager} visibilityManager - Optional visibility manager for resetting
+     */
+    async applyStepOutline(step, droneModel, meshGroupLoader, enableBlinking = true, visibilityManager = null) {
+        if (!step) return;
+
+        // Reset everything before applying new step outline
+        if (visibilityManager) {
+            visibilityManager.resetPositions();
+            await visibilityManager.showAll();
+        }
+        // Clear any existing outlines
+        this.clear();
+
+        let meshes = [];
+        const baseMeshes = step.involved?.baseMeshes || [];
+        const assembledGroups = step.involved?.assembledGroups || [];
+        
+        if (meshGroupLoader) {
+            // Process base meshes
+            baseMeshes.forEach(name => {
+                const groupMeshes = meshGroupLoader.getMeshes(name);
+                if (groupMeshes) {
+                    meshes.push(...groupMeshes);
+                } else {
+                    const direct = this._expandBaseNames(droneModel, [name]);
+                    meshes.push(...direct);
+                }
+            });
+            
+            // Process assembled groups
+            assembledGroups.forEach(name => {
+                const assembledMeshes = meshGroupLoader.getAssembledGroupMeshes(name);
+                if (assembledMeshes) {
+                    meshes.push(...assembledMeshes);
+                }
+            });
+        } else {
+            // No group loader: use direct expansion on baseMeshes only
+            meshes = this._expandBaseNames(droneModel, baseMeshes);
+        }
+
+        if (meshes.length === 0) {
+            console.warn(`No meshes found for step ${step.id}`);
+            return;
+        }
+
+        // Set outline color
+        if (step.outline && step.outline.color) {
+            this.outlinePass.visibleEdgeColor.set(step.outline.color);
+        }
+
+        // Apply outline
+        this.applySingleColorOutline(meshes, step.outline?.color);
+        
+        // Set blinking (only if enabled)
+        if (enableBlinking) {
+            const blinkFreq = step.outline?.blinkFreq || 2.0;
+            const blinking = step.outline?.blinking !== false;
+            this.setBlinking(blinking, blinkFreq);
+        } else {
+            this.setBlinking(false, 0);
+        }
+
+        console.log(`OutlineManager: Applied outline for step ${step.id} - ${meshes.length} meshes (blinking: ${enableBlinking})`);
+    }
+
+    /**
+     * Apply full step animation (outline + fade + center)
+     * @param {Object} step - The step configuration
+     * @param {THREE.Object3D} droneModel - The drone model
+     * @param {MeshGroupLoader} meshGroupLoader - The mesh group loader
+     * @param {VisibilityManager} visibilityManager - The visibility manager
+     */
+    async applyFullStepAnimation(step, droneModel, meshGroupLoader, visibilityManager) {
+        if (!step) return;
+
+        // Reset everything before applying new step
+        if (visibilityManager) {
+            visibilityManager.resetPositions();
+            await visibilityManager.showAll();
+        }
+
+        let meshes = [];
+        const baseMeshes = step.involved?.baseMeshes || [];
+        const assembledGroups = step.involved?.assembledGroups || [];
+        
+        if (meshGroupLoader) {
+            // Process base meshes
+            baseMeshes.forEach(name => {
+                const groupMeshes = meshGroupLoader.getMeshes(name);
+                if (groupMeshes) {
+                    meshes.push(...groupMeshes);
+                } else {
+                    const direct = this._expandBaseNames(droneModel, [name]);
+                    meshes.push(...direct);
+                }
+            });
+            
+            // Process assembled groups
+            assembledGroups.forEach(name => {
+                const assembledMeshes = meshGroupLoader.getAssembledGroupMeshes(name);
+                if (assembledMeshes) {
+                    meshes.push(...assembledMeshes);
+                }
+            });
+        } else {
+            // No group loader: use direct expansion on baseMeshes only
+            meshes = this._expandBaseNames(droneModel, baseMeshes);
+        }
+
+        if (meshes.length === 0) {
+            console.warn(`No meshes found for step ${step.id}`);
+            return;
+        }
+
+        // Set outline color
+        if (step.outline && step.outline.color) {
+            this.outlinePass.visibleEdgeColor.set(step.outline.color);
+        }
+
+        // Apply outline with NO blinking (permanent)
+        this.applySingleColorOutline(meshes, step.outline?.color);
+        this.setBlinking(false, 0);
+
+        console.log(`OutlineManager: Full animation for step ${step.id} - ${meshes.length} meshes (permanent outline)`);
+
+        // Wait 0.5 seconds with permanent outline
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Apply visibility and centering animation (custom sequence)
+        // Ensure blinking stays off throughout the animation
+        if (visibilityManager) {
+            await visibilityManager.showOnlyStepMeshesWithFade(step);
+            // Keep blinking disabled after animation completes
+            this.setBlinking(false, 0);
+        }
+    }
 }
