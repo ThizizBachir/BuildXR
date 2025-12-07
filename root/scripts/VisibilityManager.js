@@ -82,7 +82,7 @@ export class VisibilityManager {
         console.log(`VisibilityManager: Centered and showing ${allInvolvedMeshes.length} meshes`);
     }
 
-    async showOnlyStepMeshesWithFade(step) {
+    async showOnlyStepMeshesWithFade(step, assemblyAnimator = null, droneModel = null) {
         const involvedBaseMeshes = step.involved?.baseMeshes || [];
         const involvedAssembledGroups = step.involved?.assembledGroups || [];
 
@@ -112,10 +112,24 @@ export class VisibilityManager {
             await this._centerMeshesAtOrigin(allInvolvedMeshes);
         }
 
-        // 3. Fade out involved meshes while keeping outline
+        // 3. Fade out involved meshes while keeping outline (meshes stay at center)
         await this._fadeOutInvolved(allInvolvedMeshes);
 
-        console.log(`VisibilityManager: Completed fade sequence for ${allInvolvedMeshes.length} meshes`);
+        // 4. Wait 1 second before playing assembly animation
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 5. Play assembly animation if animator is available
+        if (assemblyAnimator && droneModel) {
+            const stepAnimation = assemblyAnimator.animationConfig?.[step.id];
+            if (stepAnimation) {
+                // Create clones for animation (originals stay at center with outline)
+                assemblyAnimator.createAnimationClones(stepAnimation, droneModel, this.scene);
+                // Play the assembly animation on clones
+                await assemblyAnimator.playAssemblyAnimation(step.id, droneModel);
+            }
+        }
+
+        console.log(`VisibilityManager: Completed fade and assembly sequence for ${allInvolvedMeshes.length} meshes`);
     }
 
     async _fadeOutNonInvolved(involvedMeshes) {
