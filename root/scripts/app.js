@@ -7,6 +7,7 @@ import { OutlineManager } from './OutlineManager.js';
 import { MeshGroupLoader } from './MeshGroupLoader.js';
 import { VisibilityManager } from './VisibilityManager.js';
 import { StepCardsUI } from './StepCardsUI.js';
+import { AssemblyAnimator } from './AssemblyAnimator.js';
 
 
 
@@ -29,6 +30,12 @@ export class application{
         
         // Initialize StepCardsUI
         this.stepCardsUI = new StepCardsUI();
+        
+        // Initialize AssemblyAnimator
+        this.assemblyAnimator = new AssemblyAnimator(this.meshGroupLoader);
+        
+        // Initialize AssemblyAnimator
+        this.assemblyAnimator = new AssemblyAnimator(this.meshGroupLoader);
 
         // Load the drone model (GLB) directly
         this.loadDroneModel('assets/drone.glb');
@@ -141,11 +148,14 @@ export class application{
                     console.warn('Failed to load mesh groups:', err);
                 }
 
-                // Load assembly config and setup step buttons
+                // Load assembly config and animation config
                 try {
                     const response = await fetch('jsons/ConfigJson/AssemblyManager.json');
                     if (response.ok) {
                         this.assemblyConfig = await response.json();
+                        
+                        // Load assembly animations config
+                        await this.assemblyAnimator.initialize('jsons/ConfigJson/AssemblyAnimations.json');
                         this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader, this.visibilityManager);
                         
                         // Initialize step cards UI with two callbacks
@@ -161,8 +171,8 @@ export class application{
                             // onStepClick (when card is clicked)
                             (step) => {
                                 console.log('Step card clicked:', step.id);
-                                // Apply full animation (outline + fade + center)
-                                this.outlineManager.applyFullStepAnimation(step, model, this.meshGroupLoader, this.visibilityManager);
+                                // Apply full animation (outline + fade + center + assembly)
+                                this.outlineManager.applyFullStepAnimation(step, model, this.meshGroupLoader, this.visibilityManager, this.assemblyAnimator);
                             }
                         );
                         
