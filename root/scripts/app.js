@@ -5,6 +5,8 @@ import * as GUI from 'lilGUI';
 import { VRButton } from 'three/webxr/VRButton.js';
 import { OutlineManager } from './OutlineManager.js';
 import { MeshGroupLoader } from './MeshGroupLoader.js';
+import { VisibilityManager } from './VisibilityManager.js';
+import { StepCardsUI } from './StepCardsUI.js';
 
 
 
@@ -21,6 +23,12 @@ export class application{
 
         // Initialize MeshGroupLoader
         this.meshGroupLoader = new MeshGroupLoader();
+        
+        // Initialize VisibilityManager
+        this.visibilityManager = null; // Will be initialized after groups are built
+        
+        // Initialize StepCardsUI
+        this.stepCardsUI = new StepCardsUI();
 
         // Load the drone model (GLB) directly
         this.loadDroneModel('assets/drone.glb');
@@ -125,6 +133,10 @@ export class application{
                     await this.meshGroupLoader.initialize('jsons/ConfigJson/MeshGroups.json');
                     this.meshGroupLoader.buildGroups(model);
                     console.log('MeshGroupLoader: Groups built');
+                    
+                    // Initialize VisibilityManager after groups are ready
+                    this.visibilityManager = new VisibilityManager(this.meshGroupLoader, this.scene);
+                    this.visibilityManager.initialize();
                 } catch (err) {
                     console.warn('Failed to load mesh groups:', err);
                 }
@@ -134,7 +146,26 @@ export class application{
                     const response = await fetch('jsons/ConfigJson/AssemblyManager.json');
                     if (response.ok) {
                         this.assemblyConfig = await response.json();
-                        this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader);
+                        this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader, this.visibilityManager);
+                        
+                        // Initialize step cards UI with two callbacks
+                        this.stepCardsUI.initialize(
+                            this.assemblyConfig,
+                            // onStepSelect (when card comes into focus by scrolling)
+                            (step) => {
+                                console.log('Step card focused:', step.id);
+                                // Apply outline only (no visibility or movement changes)
+                                // This will reset positions and visibility before applying new outline
+                                this.outlineManager.applyStepOutline(step, model, this.meshGroupLoader, true, this.visibilityManager);
+                            },
+                            // onStepClick (when card is clicked)
+                            (step) => {
+                                console.log('Step card clicked:', step.id);
+                                // Apply full animation (outline + fade + center)
+                                this.outlineManager.applyFullStepAnimation(step, model, this.meshGroupLoader, this.visibilityManager);
+                            }
+                        );
+                        
                         console.log('Assembly config loaded and step buttons created');
                     }
                 } catch (err) {
