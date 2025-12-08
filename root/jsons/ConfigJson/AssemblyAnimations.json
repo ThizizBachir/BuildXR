@@ -66,74 +66,62 @@
   "step-02": {
     "animations": [
       {
-        "mesh": "+Y_+X_Black_Leg",
-        "direction": "+Y",
-        "offset": 0.4,
-        "duration": 1.0
-      },
-      {
         "mesh": "+Y_+X_yellow_Hand",
-        "direction": "+Y",
-        "offset": 0.4,
-        "duration": 1.0
-      },
-      {
-        "mesh": "+Y_-X_Black_Leg",
-        "direction": "+Y",
-        "offset": 0.4,
-        "duration": 1.0
-      },
-      {
-        "mesh": "+Y_-X_yellow_Hand",
-        "direction": "+Y",
-        "offset": 0.4,
-        "duration": 1.0
-      },
-      {
-        "mesh": "+Y_Black_Hand",
-        "direction": "+Y",
+        "direction": "-X",
         "offset": 0.4,
         "duration": 1.0
       },
       {
         "mesh": "+Y_Cylindric_attacher_vertical_2",
-        "direction": "+Y",
+        "direction": "+X",
         "offset": 0.3,
         "duration": 1.0
       },
       {
         "mesh": "+Y_Cylindric_attacher_vertical_3",
-        "direction": "+Y",
+        "direction": "+X",
         "offset": 0.3,
         "duration": 1.0
       },
       {
         "mesh": "+Y_Cylindric_attacher_vertical_4",
-        "direction": "+Y",
+        "direction": "+X",
         "offset": 0.3,
         "duration": 1.0
       },
       {
         "mesh": "+Y_Grey_Attacher_1",
-        "direction": "+Y",
+        "direction": "+X",
         "offset": 0.3,
         "duration": 1.0
       },
       {
         "mesh": "+Y_Grey_Attacher_2",
-        "direction": "+Y",
+        "direction": "+X",
         "offset": 0.3,
         "duration": 1.0
       },
       {
+        "mesh": "+Y_Black_Hand",
+        "direction": "+X",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_-X_yellow_Hand",
+        "direction": "+X",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
         "mesh": "+Y_vise_mta3_guide_ja3ba_gris_2",
-        "direction": "+Y",
+        "direction": "+X",
         "offset": 0.3,
         "duration": 1.0
       },
       {
         "mesh": "+Y_vise_mta3_guide_ja3ba_gris_3",
-        "direction": "+Y",
+        "direction": "+X",
         "offset": 0.3,
         "duration": 1.0
       },
@@ -150,11 +138,456 @@
         "duration": 1.0
       },
       {
+        "mesh": "+Y_+X_Black_Leg",
+        "direction": "-X",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_-X_Black_Leg",
+        "direction": "+X",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
         "mesh": "+Y_vise_mta3_guide_ja3ba_gris_9",
         "direction": "+Y",
         "offset": 0.3,
         "duration": 1.0
       }
     ]
+  },
+  "step-03": {
+    "animations": [
+      {
+        "mesh": "+Y_wing_group",
+        "direction": "+Y",
+        "offset": 0.6,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_nut_1",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_nut_2",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_nut_3",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_nut_4",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_screw_1",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_screw_2",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_screw_3",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_motor_screw_4",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_Rotor",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_Rotor-ecrou",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-04": {
+    "animations": [
+      {
+        "mesh": "Circuit_Lower",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "circuit_support_1",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "circuit_support_2",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "circuit_support_3",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "circuit_support_4",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_Upper",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_nut_1",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_nut_2",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_nut_3",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_nut_4",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_screw_1",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_screw_2",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_screw_3",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Circuit_screw_4",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "plateu_1",
+        "direction": "-Y",
+        "offset": 0.2,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-05": {
+    "animations": [
+      {
+        "mesh": "circuit_group",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-X_wing_motor_group",
+        "direction": "+X",
+        "offset": 0.6,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+X_wing_motor_group",
+        "direction": "-X",
+        "offset": 0.6,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_wing_motor_group",
+        "direction": "+Z",
+        "offset": 0.6,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_wing_motor_group",
+        "direction": "-Z",
+        "offset": 0.6,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-06": {
+    "animations": [
+      {
+        "mesh": "medium_frame_group",
+        "direction": "+Y",
+        "offset": 0.6,
+        "duration": 1.0
+      },
+      {
+        "mesh": "bottom_camera_group",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+X_vise_mta3_guide_ja3ba_gris_10",
+        "direction": "+X",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+X_vise_mta3_guide_ja3ba_gris_11",
+        "direction": "+X",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+X_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul",
+        "direction": "+X",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_vise_mta3_guide_ja3ba_gris",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_vise_mta3_guide_ja3ba_gris_1",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-X_vise_mta3_guide_ja3ba_gris_10",
+        "direction": "-X",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-X_vise_mta3_guide_ja3ba_gris_11",
+        "direction": "-X",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-X_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul",
+        "direction": "-X",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_vise_mta3_guide_ja3ba_gris_10",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_vise_mta3_guide_ja3ba_gris_11",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_el_wa7da_el_bi4a_elli_bin_zouz_ecrou_ama_beltoul",
+        "direction": "-Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Blue_Box",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Grey_Box",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "wires_1",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "wires_2",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "wires_3",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "wires_4",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-07": {
+    "animations": [
+      {
+        "mesh": "+X_+Y_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+X_-Y_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+X_yellow_Arc_Guide",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_+X_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_-X_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_yellow_Arc_Guide",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-X_+Y_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-X_-Y_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-X_yellow_Arc_Guide",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_+X_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_-X_yellow_arc_stand",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_yellow_Arc_Guide",
+        "direction": "+Y",
+        "offset": 0.4,
+        "duration": 1.0
+      },
+      {
+        "mesh": "plateu_2",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "plateu_3",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-08": {
+    "animations": [
+      {
+        "mesh": "upper_group",
+        "direction": "+Y",
+        "offset": 0.7,
+        "duration": 1.0
+      },
+      {
+        "mesh": "medium_bottom_frame_group",
+        "direction": "-Y",
+        "offset": 0.6,
+        "duration": 1.0
+      }
+    ]
   }
 }
+
