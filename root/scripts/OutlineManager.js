@@ -33,14 +33,28 @@ export class OutlineManager {
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
 
-    _setupComposer() {
-        this.composer = new EffectComposer(this.renderer);
-        this.composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        this.composer.setSize(window.innerWidth, window.innerHeight);
+   _setupComposer() {
+    // Use an RGBA render target so the composer output can be composited
+    // over the camera video background (transparent areas let the video show).
+    const size = this.renderer.getSize(new THREE.Vector2());
+    const pixelRatio = Math.min(window.devicePixelRatio, 2);
+    const renderTarget = new THREE.WebGLRenderTarget(Math.floor(size.x * pixelRatio), Math.floor(size.y * pixelRatio), {
+        format: THREE.RGBAFormat,
+        stencilBuffer: false,
+        depthBuffer: true,
+        generateMipmaps: false
+    });
+    renderTarget.texture.encoding = this.renderer.outputEncoding;
 
-        const renderPass = new RenderPass(this.scene, this.camera);
-        this.composer.addPass(renderPass);
-    }
+    this.composer = new EffectComposer(this.renderer, renderTarget);
+    this.composer.setPixelRatio(pixelRatio);
+    this.composer.setSize(window.innerWidth, window.innerHeight);
+
+    const renderPass = new RenderPass(this.scene, this.camera);
+    // Keep clearing enabled on the render pass so frames do not accumulate.
+    renderPass.clear = true;
+    this.composer.addPass(renderPass);
+}
 
     /**
      * Build an index of mesh name bases to numbered variants.
