@@ -1,0 +1,196 @@
+{
+  "steps": [
+    {
+      "id": "step-01",
+      "label": "Attach Board & Standoffs",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["base_assembly"]
+      },
+      "outline": {
+        "color": "#00ffcc",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-02",
+      "label": "Attach Motors",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["motors_group"]
+      },
+      "outline": {
+        "color": "#ff00cc",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-03",
+      "label": "Attach Wheels",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["wheels_group"]
+      },
+      "outline": {
+        "color": "#19c1ff",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-04",
+      "label": "Install Circuits",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["circuit_group"]
+      },
+      "outline": {
+        "color": "#ffcc00",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-05",
+      "label": "Install Battery",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["battery_group"]
+      },
+      "outline": {
+        "color": "#b3ff00",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-06",
+      "label": "Attach Steering Wheel",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["steering_wheel_group"]
+      },
+      "outline": {
+        "color": "#ffffff",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-07",
+      "label": "Drive System Assembly",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["drive_system"]
+      },
+      "outline": {
+        "color": "#cc00ff",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    },
+    {
+      "id": "step-08",
+      "label": "Complete Assembly",
+      "involved": {
+        "baseMeshes": [],
+        "assembledGroups": ["full_line_follower"]
+      },
+      "outline": {
+        "color": "#ae0001",
+        "blinking": true,
+        "blinkFreq": 2.0
+      },
+      "visibility": {
+        "nonInvolved": "fade",
+        "opacity": 0.15,
+        "duration": 0.35
+      },
+      "staging": {
+        "toCenter": true,
+        "centerPoint": [0, 1.2, 0],
+        "radius": 0.6,
+        "duration": 0.5
+      }
+    }
+  ]
+}

@@ -4,6 +4,96 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
+/* Product Selection Screen */
+.product-selection-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.product-selection-overlay.fade-out {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.product-selection-container {
+  text-align: center;
+  max-width: 900px;
+  padding: 40px;
+}
+
+.product-selection-title {
+  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 50px;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.product-cards {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.product-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px 30px;
+  width: 280px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.product-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.product-card-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.product-card-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.product-card-description {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+}
+
 canvas {
   display: block;
   width: 100%;
