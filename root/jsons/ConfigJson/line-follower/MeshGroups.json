@@ -34,56 +34,20 @@
   ],
   "assembledGroups": [
     {
-      "name": "board_group",
-      "groups": ["board"]
+      "name": "board+circuit",
+      "groups": ["battery_holder", "board", "upper_circuit", "lower_Circuit"]
     },
     {
-      "name": "circuit_group",
-      "groups": ["upper_circuit", "lower_Circuit"]
+      "name": "assembled_wheels",
+      "groups": ["board+circuit", "-Y_Wheel", "+Y_Motor", "+Y_Wheel", "-Y_Motor", "+YW_nut-", "+YW_Screw-", "+YW_Screw+", "+YW_nut+", "-YW_nut+", "-YW_Screw+", "-YW_Screw-", "-YW_nut-"]
     },
     {
-      "name": "standoffs_group",
-      "groups": ["Standoff_A", "Standoff_B", "Standoff_C", "Standoff_D"]
+      "name": "full_assembly",
+      "groups": ["assembled_wheels", "steeringW_screwA-", "Standoff_A", "steering_wheel", "Standoff_B", "Standoff_C", "Standoff_D", "steeringW_screwC-", "steeringW_screwD-", "steeringW_screwB-", "steeringW_screwA+", "steeringW_screwB+", "steeringW_screwC+", "steeringW_screwD+"]
     },
     {
-      "name": "steering_wheel_group",
-      "groups": ["steering_wheel", "steeringW_screwA-", "steeringW_screwB-", "steeringW_screwC-", "steeringW_screwD-", "steeringW_screwA+", "steeringW_screwB+", "steeringW_screwC+", "steeringW_screwD+"]
-    },
-    {
-      "name": "+Y_wheel_group",
-      "groups": ["+Y_Wheel", "+YW_nut-", "+YW_Screw-", "+YW_Screw+", "+YW_nut+"]
-    },
-    {
-      "name": "-Y_wheel_group",
-      "groups": ["-Y_Wheel", "-YW_nut+", "-YW_Screw+", "-YW_Screw-", "-YW_nut-"]
-    },
-    {
-      "name": "wheels_group",
-      "groups": ["+Y_wheel_group", "-Y_wheel_group"]
-    },
-    {
-      "name": "motors_group",
-      "groups": ["+Y_Motor", "-Y_Motor"]
-    },
-    {
-      "name": "battery_group",
-      "groups": ["battery_holder", "battery_A", "battery_B"]
-    },
-    {
-      "name": "base_assembly",
-      "groups": ["board_group", "standoffs_group"]
-    },
-    {
-      "name": "drive_system",
-      "groups": ["motors_group", "wheels_group"]
-    },
-    {
-      "name": "electronics_assembly",
-      "groups": ["circuit_group", "battery_group"]
-    },
-    {
-      "name": "full_line_follower",
-      "groups": ["base_assembly", "drive_system", "electronics_assembly", "steering_wheel_group"]
+      "name": "functional",
+      "groups": ["full_assembly", "battery_B", "battery_A"]
     }
   ]
 }
