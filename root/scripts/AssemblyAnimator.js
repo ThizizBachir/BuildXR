@@ -48,17 +48,23 @@ export class AssemblyAnimator {
     }
 
     /**
-     * Get meshes from a base name (expands numbered variants)
+     * Get meshes from a base name or assembled group (expands numbered variants)
      * @param {THREE.Object3D} droneModel - The drone model
-     * @param {string} baseName - Base name to expand
+     * @param {string} baseName - Base name or assembled group name to expand
      * @returns {THREE.Mesh[]} Array of meshes
      */
     _getMeshesByName(droneModel, baseName) {
-        // First try to get from mesh group loader
+        // First try to get from mesh group loader as base mesh
         if (this.meshGroupLoader) {
             const groupMeshes = this.meshGroupLoader.getMeshes(baseName);
             if (groupMeshes && groupMeshes.length > 0) {
                 return groupMeshes;
+            }
+            
+            // Try as assembled group
+            const assembledMeshes = this.meshGroupLoader.getAssembledGroupMeshes(baseName);
+            if (assembledMeshes && assembledMeshes.length > 0) {
+                return assembledMeshes;
             }
         }
 

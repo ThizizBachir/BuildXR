@@ -1,0 +1,222 @@
+{
+  "step-01": {
+    "animations": [
+      {
+        "mesh": "board",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "battery_holder",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "lower_Circuit",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "upper_circuit",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-02": {
+    "animations": [
+      {
+        "mesh": "board+circuit",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_Motor",
+        "direction": "+Z",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_Motor",
+        "direction": "-Z",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+YW_Screw-",
+        "direction": "+Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+YW_nut-",
+        "direction": "-Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+YW_Screw+",
+        "direction": "+Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+YW_nut+",
+        "direction": "-Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-YW_Screw+",
+        "direction": "-Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-YW_nut+",
+        "direction": "+Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-YW_Screw-",
+        "direction": "-Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-YW_nut-",
+        "direction": "+Z",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "-Y_Wheel",
+        "direction": "+Z",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "+Y_Wheel",
+        "direction": "-Z",
+        "offset": 0.5,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-03": {
+    "animations": [
+      {
+        "mesh": "assembled_wheels",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Standoff_A",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Standoff_B",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Standoff_C",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "Standoff_D",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steering_wheel",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwA-",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwB-",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwC-",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwD-",
+        "direction": "+Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwA+",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwB+",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwC+",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      },
+      {
+        "mesh": "steeringW_screwD+",
+        "direction": "-Y",
+        "offset": 0.3,
+        "duration": 1.0
+      }
+    ]
+  },
+  "step-04": {
+    "animations": [
+      {
+        "mesh": "full_assembly",
+        "direction": "+Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "battery_A",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      },
+      {
+        "mesh": "battery_B",
+        "direction": "-Y",
+        "offset": 0.5,
+        "duration": 1.0
+      }
+    ]
+  }
+}

@@ -19,6 +19,7 @@ export class OutlineManager {
         this.blinkFreq = 2.0; // Hz
         this.blinkTimer = 0;
         this.blinkVisible = true;
+        this.permanentOutline = false; // Flag to prevent blinking during animations
 
         // Mesh name index (base -> [variants])
         this._meshIndexBuilt = false;
@@ -164,7 +165,8 @@ export class OutlineManager {
      * @param {number} deltaTime - Time since last frame in seconds
      */
     update(deltaTime) {
-        if (!this.isBlinking) return;
+        // Don't blink if permanent outline is active or blinking is disabled
+        if (!this.isBlinking || this.permanentOutline) return;
 
         this.blinkTimer += deltaTime;
         const period = 1.0 / this.blinkFreq;
@@ -400,6 +402,8 @@ export class OutlineManager {
         }
         // Clear any existing outlines
         this.clear();
+        // Reset permanent outline flag to allow blinking on hover
+        this.permanentOutline = false;
 
         let meshes = [];
         const baseMeshes = step.involved?.baseMeshes || [];
@@ -455,13 +459,14 @@ export class OutlineManager {
     }
 
     /**
-     * Apply full step animation (outline + fade + center)
+     * Apply full step animation (outline + fade + center + assembly)
      * @param {Object} step - The step configuration
      * @param {THREE.Object3D} droneModel - The drone model
      * @param {MeshGroupLoader} meshGroupLoader - The mesh group loader
      * @param {VisibilityManager} visibilityManager - The visibility manager
+     * @param {AssemblyAnimator} assemblyAnimator - The assembly animator (optional)
      */
-    async applyFullStepAnimation(step, droneModel, meshGroupLoader, visibilityManager) {
+    async applyFullStepAnimation(step, droneModel, meshGroupLoader, visibilityManager, assemblyAnimator = null) {
         if (!step) return;
 
         // Reset everything before applying new step
@@ -511,6 +516,7 @@ export class OutlineManager {
         // Apply outline with NO blinking (permanent)
         this.applySingleColorOutline(meshes, step.outline?.color);
         this.setBlinking(false, 0);
+        this.permanentOutline = true; // Lock outline as permanent during animation
 
         console.log(`OutlineManager: Full animation for step ${step.id} - ${meshes.length} meshes (permanent outline)`);
 
@@ -520,9 +526,10 @@ export class OutlineManager {
         // Apply visibility and centering animation (custom sequence)
         // Ensure blinking stays off throughout the animation
         if (visibilityManager) {
-            await visibilityManager.showOnlyStepMeshesWithFade(step);
-            // Keep blinking disabled after animation completes
+            await visibilityManager.showOnlyStepMeshesWithFade(step, assemblyAnimator, droneModel);
+            // Keep blinking disabled and permanent outline locked
             this.setBlinking(false, 0);
+            // Note: permanentOutline stays true until next hover
         }
     }
 }

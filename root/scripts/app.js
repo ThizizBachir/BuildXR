@@ -7,6 +7,10 @@ import { OutlineManager } from './OutlineManager.js';
 import { MeshGroupLoader } from './MeshGroupLoader.js';
 import { VisibilityManager } from './VisibilityManager.js';
 import { StepCardsUI } from './StepCardsUI.js';
+import { AssemblyAnimator } from './AssemblyAnimator.js';
+import { VRGazeController } from './VRGazeController.js';
+import { VRStepNavigator } from './VRStepNavigator.js';
+import { ProductSelector } from './ProductSelector.js';
 
 
 
@@ -29,9 +33,21 @@ export class application{
         
         // Initialize StepCardsUI
         this.stepCardsUI = new StepCardsUI();
+        
+        // Initialize AssemblyAnimator
+        this.assemblyAnimator = new AssemblyAnimator(this.meshGroupLoader);
+        
+        // Initialize VR components (will be set up after camera is created)
+        this.vrGazeController = null;
+        this.vrStepNavigator = null;
 
-        // Load the drone model (GLB) directly
-        this.loadDroneModel('assets/drone.glb');
+        // Initialize ProductSelector and wait for user to choose
+        this.productSelector = new ProductSelector();
+        this.productSelector.initialize((productType) => {
+            console.log(`Loading product: ${productType}`);
+            const config = ProductSelector.getProductConfig(productType);
+            this.loadProductModel(config);
+        });
     }
 
 
@@ -96,29 +112,33 @@ export class application{
         // this.setupLightingGUI();
     }
 
-    loadDroneModel(path){
+    /**
+     * Load a product model with its configuration
+     * @param {Object} config - Product configuration (modelPath, meshGroupsPath, assemblyPath, animationsPath, scale, position)
+     */
+    loadProductModel(config){
         const loader = new GLTFLoader();
         loader.load(
-            path,
+            config.modelPath,
             async (gltf) => {
                 const model = gltf.scene || gltf.scenes?.[0];
                 if (!model) {
                     console.warn('GLTF contains no scene');
                     return;
                 }
-                // Optional: scale/position tweak
-                model.scale.set(2, 2, 2);
-                model.position.set(0, 0, 0);
+                // Apply scale and position from config
+                model.scale.set(config.scale, config.scale, config.scale);
+                model.position.set(...config.position);
 
                 this.scene.add(model);
-                this.droneModel = model;
+                this.productModel = model;
 
                 // Do not outline by default; leave selection empty
                 this.outlineManager.setSelectedObjects([]);
-                console.log('Drone model loaded:', path);
+                console.log('Product model loaded:', config.modelPath);
 
                 // Log all mesh names for debugging
-                console.log('=== All Mesh Names in Drone Model ===');
+                console.log('=== All Mesh Names in Product Model ===');
                 const meshNames = [];
                 model.traverse((child) => {
                     if (child.isMesh) {
@@ -130,7 +150,7 @@ export class application{
 
                 // Load mesh groups config and build groups
                 try {
-                    await this.meshGroupLoader.initialize('jsons/ConfigJson/MeshGroups.json');
+                    await this.meshGroupLoader.initialize(config.meshGroupsPath);
                     this.meshGroupLoader.buildGroups(model);
                     console.log('MeshGroupLoader: Groups built');
                     
@@ -141,11 +161,14 @@ export class application{
                     console.warn('Failed to load mesh groups:', err);
                 }
 
-                // Load assembly config and setup step buttons
+                // Load assembly config and animation config
                 try {
-                    const response = await fetch('jsons/ConfigJson/AssemblyManager.json');
+                    const response = await fetch(config.assemblyPath);
                     if (response.ok) {
                         this.assemblyConfig = await response.json();
+                        
+                        // Load assembly animations config
+                        await this.assemblyAnimator.initialize(config.animationsPath);
                         this.outlineManager.setupStepButtons(model, this.assemblyConfig, this.meshGroupLoader, this.visibilityManager);
                         
                         // Initialize step cards UI with two callbacks
@@ -161,10 +184,25 @@ export class application{
                             // onStepClick (when card is clicked)
                             (step) => {
                                 console.log('Step card clicked:', step.id);
-                                // Apply full animation (outline + fade + center)
-                                this.outlineManager.applyFullStepAnimation(step, model, this.meshGroupLoader, this.visibilityManager);
+                                // Apply full animation (outline + fade + center + assembly)
+                                this.outlineManager.applyFullStepAnimation(step, model, this.meshGroupLoader, this.visibilityManager, this.assemblyAnimator);
                             }
                         );
+                        
+                        // Initialize VR step navigator with same callback
+                        this.vrStepNavigator.initialize(
+                            this.assemblyConfig.steps,
+                            (step) => {
+                                console.log('VR: Step selected:', step.id);
+                                // Apply full animation in VR
+                                this.outlineManager.applyFullStepAnimation(step, model, this.meshGroupLoader, this.visibilityManager, this.assemblyAnimator);
+                            }
+                        );
+                        
+                        // Register VR interactables with gaze controller
+                        this.vrStepNavigator.getInteractables().forEach(button => {
+                            this.vrGazeController.addInteractable(button, button.userData.vrCallback);
+                        });
                         
                         console.log('Assembly config loaded and step buttons created');
                     }
@@ -174,9 +212,25 @@ export class application{
             },
             undefined,
             (err) => {
-                console.error('Failed to load drone model:', path, err);
+                console.error('Failed to load product model:', config.modelPath, err);
             }
         );
+    }
+    
+    /**
+     * Legacy method for backward compatibility
+     * @deprecated Use loadProductModel instead
+     */
+    loadDroneModel(path) {
+        const config = {
+            modelPath: path,
+            meshGroupsPath: 'jsons/ConfigJson/drone/MeshGroups.json',
+            assemblyPath: 'jsons/ConfigJson/drone/AssemblyManager.json',
+            animationsPath: 'jsons/ConfigJson/drone/AssemblyAnimations.json',
+            scale: 2,
+            position: [0, 0, 0]
+        };
+        this.loadProductModel(config);
     }
 
 
@@ -188,6 +242,24 @@ export class application{
         this.Cam = new THREE.PerspectiveCamera(fov, aspect, near, far);
         this.Cam.position.set(0, 6.5 ,2);
         this.Cam.lookAt(0, 0, 0);
+        
+        // Initialize VR controllers after camera is created
+        this.vrGazeController = new VRGazeController(this.scene, this.Cam, this.renderer);
+        this.vrStepNavigator = new VRStepNavigator(this.scene, this.Cam, THREE);
+        
+        // Set up VR gaze callbacks
+        this.vrGazeController.onGazeStart = (object) => {
+            if (object.userData.isButton) {
+                this.vrStepNavigator.highlightButton(object);
+            }
+        };
+        
+        this.vrGazeController.onGazeEnd = () => {
+            // Unhighlight all buttons
+            this.vrStepNavigator.getInteractables().forEach(button => {
+                this.vrStepNavigator.unhighlightButton(button);
+            });
+        };
 
         
 
@@ -285,9 +357,10 @@ export class application{
 
 
 
-    update(deltaTime){
+    startRenderLoop() {
         let lastTime = 0;
-        // In WebXR, we use setAnimationLoop instead of requestAnimationFrame
+        
+        // Use setAnimationLoop for both VR and non-VR rendering
         this.renderer.setAnimationLoop((time) => {
             // Calculate delta time in seconds
             const dt = lastTime ? (time - lastTime) / 1000 : 0;
@@ -295,18 +368,28 @@ export class application{
 
             // Update outline blinking
             this.outlineManager.update(dt);
-
-            // Handle XR rendering
-            if (this.renderer.xr.isPresenting) {
-                this.renderer.render(this.scene, this.Cam);
-            } else {
-                // Use OutlineManager to render with post-processing
-                this.outlineManager.render();
+            
+            // Update VR components
+            const isPresenting = this.renderer.xr.isPresenting;
+            if (this.vrGazeController) {
+                this.vrGazeController.update(dt);
+            }
+            if (this.vrStepNavigator) {
+                this.vrStepNavigator.update(isPresenting);
             }
 
-            // Update controls if they exist
-            if (this.Cam_Controls) {
+            // Update controls only when NOT in VR (VR headset controls camera)
+            if (this.Cam_Controls && !isPresenting) {
                 this.Cam_Controls.update();
+            }
+
+            // Render the scene
+            if (isPresenting) {
+                // In VR mode, renderer handles stereo rendering automatically
+                this.renderer.render(this.scene, this.Cam);
+            } else {
+                // Use OutlineManager to render with post-processing effects
+                this.outlineManager.render();
             }
         });
     }
